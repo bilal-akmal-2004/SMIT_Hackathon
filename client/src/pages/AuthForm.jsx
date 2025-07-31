@@ -41,7 +41,7 @@ function AuthForm() {
       try {
         const url = formState === "Sign up" ? "/register" : "/login";
         const res = await axios.post(
-          `http://localhost:3000/api/auth${url}`,
+          `${import.meta.env.VITE_API_BASE_URL}/api/auth${url}`,
           formData,
           { withCredentials: true } // allows cookies
         );
