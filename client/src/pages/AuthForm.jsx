@@ -1,17 +1,19 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { useGoogleLogin } from "@react-oauth/google";
 import Joi from "joi";
 import { useTheme } from "../context/ThemeContext"; // adjust path as needed
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
+import SetPasswordModal from "../components/SetPasswordModal.jsx";
 import { toast } from "react-toastify";
+import { googleAuth } from "../api.js";
 
 function AuthForm() {
   const navigate = useNavigate();
 
   // this state is for when the use want to log in or he want to sign up
   const [formState, setFormState] = useState("Sign up");
-
+  const [showModal, setShowModal] = useState(false);
   const { theme } = useTheme(); // inside the AuthForm component
 
   const [formData, setFormData] = useState({
@@ -37,27 +39,26 @@ function AuthForm() {
       setErrors(formattedErrors);
     } else {
       setErrors({});
-      console.log("Form data is valid ✅", formData);
       try {
         const url = formState === "Sign up" ? "/register" : "/login";
+
         const res = await axios.post(
           `${import.meta.env.VITE_API_BASE_URL}/api/auth${url}`,
           formData,
-          { withCredentials: true } // allows cookies
+          { withCredentials: true }
         );
-        console.log("Resospoin in handle sub,it: ", res);
-        toast.success(res.data.msg);
-        console.log("Logged in:", res.data.user);
-        // (Optional) Save user if returned
-        localStorage.setItem("user", JSON.stringify("some user"));
-
-        // ✅ Redirect
-        navigate("/home");
+        if (res.data.code === "PASSWORD_NOT_SET") {
+          setShowModal(true);
+        } else {
+          toast.success(res.data.msg);
+          navigate("/home");
+        }
       } catch (err) {
         toast.error(err.response?.data?.msg || "Something went wrong");
       }
     }
   };
+
   // here is the scheme for the joi
   const schema = Joi.object({
     email: Joi.string()
@@ -82,6 +83,28 @@ function AuthForm() {
         : Joi.optional(),
   });
 
+  // this is for the google login using the googel button
+  //response google
+  const responseGoogle = async (authResult) => {
+    try {
+      console.log(authResult);
+      if (authResult["code"]) {
+        const result = await googleAuth(authResult["code"]);
+        const { email, name } = result.data.user;
+        console.log("result data user : ", result.data.user);
+      }
+      console.log(authResult);
+      navigate("/home");
+    } catch (error) {
+      console.error("Error while requesting googel code: ", error);
+    }
+  };
+  const googleLogin = useGoogleLogin({
+    onSuccess: responseGoogle,
+    onError: responseGoogle,
+    flow: "auth-code",
+  });
+
   return (
     <div
       className={`border ${
@@ -98,6 +121,7 @@ function AuthForm() {
           <form onSubmit={handleSubmit}>
             <div className="flex flex-col items-center">
               <button
+                onClick={googleLogin}
                 type="button"
                 className={`w-full max-w-xs font-bold cursor-pointer shadow-sm rounded-lg py-3 flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline ${
                   theme === "light"
@@ -125,7 +149,7 @@ function AuthForm() {
                     />
                   </svg>
                 </div>
-                <span className="ml-4 ">
+                <span className="ml-4">
                   {formState === "Sign up"
                     ? "Sign Up with Google"
                     : "Log in with Google"}
@@ -311,6 +335,12 @@ function AuthForm() {
           </form>
         </div>
       </div>
+      <SetPasswordModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        email={formData.email}
+        theme={theme}
+      />
     </div>
   );
 }

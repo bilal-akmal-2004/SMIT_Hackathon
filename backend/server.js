@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
+
 import authRoutes from "./routes/authRoutes.js";
 import cookieParser from "cookie-parser";
 
@@ -35,6 +36,7 @@ mongoose
 
 // Routes
 app.use("/api/auth", authRoutes);
+
 app.get("/", (req, res) => {
   res.send("Server is running.");
 });

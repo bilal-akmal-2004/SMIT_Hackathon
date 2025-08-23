@@ -5,10 +5,19 @@ import { useTheme } from "./context/ThemeContext";
 import { ThemeToggle } from "./components/ThemeToggle";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import PageNotFound from "../src/pages/PageNotFound";
-import HomePage from "./pages/HomePage"; // create this
+import HomePage from "./pages/HomePage";
+
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import ProtectedRoute from "./components/ProtectedRoute";
 export default function App() {
   const { theme } = useTheme();
+
+  const GoogleWrapper = () => (
+    <GoogleOAuthProvider clientId="1079183921375-uqqvv5cbsjot1ibuj2huiut53ntacjr0.apps.googleusercontent.com">
+      <AuthForm></AuthForm>
+    </GoogleOAuthProvider>
+  );
+
   return (
     <div
       className={`flex justify-center items-center h-screen  transition-all duration-700 ${
@@ -17,7 +26,7 @@ export default function App() {
     >
       <Router>
         <Routes>
-          <Route path="/" element={<AuthForm />} />
+          <Route path="/" element={<GoogleWrapper />} />
           <Route
             path="/home"
             element={
