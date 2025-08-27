@@ -14,7 +14,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://smit-hackathon-client-git-main-bilal-akmals-projects.vercel.app",
+      "https://smit-hackathon-client.vercel.app",
     ],
     credentials: true,
   })
