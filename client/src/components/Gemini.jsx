@@ -25,11 +25,14 @@ const Gemini = () => {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:3000/api/gemini", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt }),
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/gemini`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt }),
+        }
+      );
 
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
 
