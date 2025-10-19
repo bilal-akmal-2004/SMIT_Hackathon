@@ -55,7 +55,9 @@ app.post("/api/gemini/pdf", upload.single("file"), async (req, res) => {
     // safe import that handles both CJS and ESM shapes
 
     // prompt from form-data
-    const prompt = req.body?.prompt || "Summarize this PDF as a doctor";
+    const prompt =
+      req.body?.prompt ||
+      "You are HealthMate, a virtual doctor. Summarize this PDF and give medical or lifestyle insights based on the content in not too long or not too short, but make the answer easy to read.";
 
     if (!req.file || !req.file.buffer) {
       return res.status(400).json({ error: "No PDF file uploaded" });
@@ -94,12 +96,21 @@ app.post("/api/gemini", async (req, res) => {
       return res.status(400).json({ error: "Prompt is required" });
     }
 
+    // 🧠 Doctor persona context
+    const doctorContext = `
+You are HealthMate, a friendly and knowledgeable virtual doctor. 
+Your tone should be caring, empathetic, and professional — similar to how a real doctor would talk to a patient.
+Always focus on promoting health, giving safe and evidence-based recommendations,
+and reminding users to consult a real healthcare professional before taking serious action.
+`;
+
+    const finalPrompt = `${doctorContext}\n\nUser: ${prompt}\n\nHealthMate Doctor:`;
+
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
-      contents: prompt,
+      contents: finalPrompt,
     });
 
-    // Gemini SDK may return response.text or response.output_text depending on version
     res.json({ text: response.text || response.output_text || "No response" });
   } catch (error) {
     console.error("Gemini chat error:", error);

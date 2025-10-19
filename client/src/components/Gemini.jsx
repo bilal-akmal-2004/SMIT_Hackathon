@@ -70,7 +70,7 @@ const Gemini = () => {
               : "text-indigo-400 border-gray-800"
           }`}
         >
-          🧠 Gemini Chat
+          🧠 Health Mate AI Chat
         </div>
 
         {/* Chat area */}
@@ -81,7 +81,7 @@ const Gemini = () => {
                 theme === "light" ? "text-gray-500" : "text-gray-400"
               }`}
             >
-              💬 Start a conversation with Gemini...
+              💬 Start a conversation with Health Mate...
             </div>
           )}
 

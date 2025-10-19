@@ -160,9 +160,10 @@ const HomePage = () => {
 
             {/* Content */}
             <div
-              className={`flex-grow  p-4 sm:p-8 ${
+              className={`flex-grow p-4 sm:p-8 overflow-auto transition-colors duration-300 ${
                 theme === "light" ? "bg-white" : "bg-gray-900"
               }`}
+              style={{ minHeight: "0" }} // ensures flex-grow + overflow works properly
             >
               {activeTab === "chat" ? <Gemini /> : <GeminiPdf />}
             </div>
