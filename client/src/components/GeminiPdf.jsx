@@ -1,3 +1,4 @@
+// GeminiPdf.jsx
 import React, { useState } from "react";
 import { useTheme } from "../context/ThemeContext";
 
@@ -7,6 +8,43 @@ const GeminiPDF = () => {
   const [response, setResponse] = useState("");
   const [loading, setLoading] = useState(false);
   const { theme } = useTheme();
+
+  const formatAIResponse = (text) => {
+    if (!text) return "";
+
+    return (
+      text
+        // 1. Remove divider lines (*, **, ***, etc.)
+        .replace(/^\s*\*{2,}\s*$/gm, "")
+        .replace(/^\s*\*\s*$/gm, "")
+
+        // 2. Remove Markdown headings
+        .replace(/^#{1,3}\s*/gm, "")
+
+        // 3. Convert bullet points to paragraphs
+        .replace(/^(\s*)[-*+]\s+(.*$)/gm, "$1• $2")
+
+        // 4. Bold and italic
+        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+        .replace(/__(.*?)__/g, "<strong>$1</strong>")
+        .replace(/\b\*(.*?)\*\b/g, "<em>$1</em>")
+
+        // 5. Bold numbered list starters (1. Title: ...)
+        .replace(/^(\d+\.\s.*?:)/gm, "<strong>$1</strong>")
+
+        // 6. Split into paragraphs on 2+ newlines
+        .replace(/\n{2,}/g, '</p><p class="mb-4">')
+
+        // 7. Wrap first paragraph
+        .replace(/^/, '<p class="mb-4">')
+
+        // 8. Close final paragraph
+        .replace(/$/, "</p>")
+
+        // 9. Clean up empty paragraphs
+        .replace(/<p class="mb-4">\s*<\/p>/g, "")
+    );
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,132 +56,189 @@ const GeminiPDF = () => {
     formData.append("file", file);
     formData.append("prompt", prompt);
 
-    const res = await fetch(
-      `${import.meta.env.VITE_API_BASE_URL}/api/gemini/pdf`,
-      {
-        method: "POST",
-        body: formData,
-      }
-    );
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/gemini/pdf`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
-    const data = await res.json();
-    setResponse(data.text);
-    setLoading(false);
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+
+      const data = await res.json();
+      setResponse(data.text || "No response received.");
+    } catch (err) {
+      console.error(err);
+      setResponse("Sorry, something went wrong while analyzing your PDF.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div
-      className={`min-h-[60vh] flex items-start justify-center p-6 transition-colors duration-300 ${
+      className={`w-full h-full flex flex-col transition-colors duration-300 ${
         theme === "light"
           ? "bg-gradient-to-br from-indigo-50 via-white to-blue-50"
           : "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-950"
       }`}
     >
+      {/* Main container with strict height control */}
       <div
-        className={`rounded-2xl shadow-2xl w-full max-w-5xl p-8 border transition-all duration-300 ${
+        className={`flex flex-col h-full w-full overflow-hidden rounded-2xl border transition ${
           theme === "light"
             ? "bg-white border-gray-200"
             : "bg-gray-900 border-gray-800"
         }`}
       >
-        <h2
-          className={`text-3xl font-bold mb-6 flex items-center justify-center gap-2 transition-colors ${
-            theme === "light" ? "text-indigo-700" : "text-indigo-400"
-          }`}
-        >
-          <span>🩺</span> Gemini Medical PDF Assistant
-        </h2>
+        {/* Header */}
+        <div className="shrink-0 p-6 pb-4 border-b">
+          <div className="flex items-start gap-4">
+            <div className="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center bg-indigo-600 text-white text-xl shadow">
+              🩺
+            </div>
+            <div className="flex-1">
+              <h2
+                className={`text-xl font-bold ${
+                  theme === "light" ? "text-slate-800" : "text-indigo-300"
+                }`}
+              >
+                Medical PDF Analyzer
+              </h2>
+              <p
+                className={`text-sm mt-1 ${
+                  theme === "light" ? "text-gray-600" : "text-gray-300"
+                }`}
+              >
+                Upload a report and get clear, actionable insights.
+              </p>
+            </div>
+          </div>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* File Upload */}
-          <label
-            className={`flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-8 cursor-pointer transition-all ${
-              theme === "light"
-                ? "border-indigo-300 hover:border-indigo-500 bg-indigo-50/30"
-                : "border-indigo-600 hover:border-indigo-400 bg-gray-800/50"
-            }`}
-          >
-            <input
-              type="file"
-              accept="application/pdf"
-              onChange={(e) => setFile(e.target.files[0])}
-              className="hidden"
-            />
-            <p
-              className={`text-base ${
-                theme === "light" ? "text-gray-600" : "text-gray-300"
+        {/* Scrollable content area: form + response */}
+        <div className="flex-1 overflow-hidden p-4 flex flex-col gap-5">
+          {/* Upload & Prompt Form */}
+          <div className="shrink-0 space-y-5">
+            <label
+              className={`flex flex-col items-center justify-center border-2 border-dashed rounded-xl p-5 cursor-pointer transition ${
+                theme === "light"
+                  ? "border-indigo-200 hover:border-indigo-300 bg-indigo-50/40"
+                  : "border-indigo-600 hover:border-indigo-500 bg-gray-800/50"
               }`}
             >
-              {file ? (
-                <span
-                  className={`font-semibold ${
-                    theme === "light" ? "text-indigo-700" : "text-indigo-400"
+              <input
+                type="file"
+                accept="application/pdf"
+                onChange={(e) => setFile(e.target.files?.[0] || null)}
+                className="sr-only"
+              />
+              <div className="text-center">
+                {file ? (
+                  <div className="text-sm">
+                    <span
+                      className={`font-medium ${
+                        theme === "light"
+                          ? "text-indigo-700"
+                          : "text-indigo-300"
+                      }`}
+                    >
+                      {file.name}
+                    </span>
+                    <div className="text-xs mt-1 opacity-80">
+                      Click to change
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <p
+                      className={`font-medium ${
+                        theme === "light" ? "text-gray-700" : "text-gray-300"
+                      }`}
+                    >
+                      📎 Upload Medical Report (PDF)
+                    </p>
+                    <p className="text-xs mt-1 opacity-70">
+                      Lab results, prescriptions, or doctor's notes
+                    </p>
+                  </>
+                )}
+              </div>
+            </label>
+
+            <textarea
+              rows="2"
+              placeholder="E.g., What do my lab results mean? Should I be concerned about anything?"
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              className={`w-full rounded-xl p-3 text-sm focus:outline-none focus:ring-2 transition ${
+                theme === "light"
+                  ? "border border-gray-300 bg-gray-50 focus:ring-indigo-400 text-slate-800"
+                  : "border border-gray-700 bg-gray-800 focus:ring-indigo-500 text-gray-200"
+              }`}
+            />
+
+            <div className="flex gap-3">
+              <button
+                type="submit"
+                onClick={handleSubmit}
+                disabled={loading || !file}
+                className={`flex-1 py-2.5 rounded-lg font-medium text-sm transition ${
+                  loading || !file
+                    ? "opacity-60 cursor-not-allowed"
+                    : "hover:bg-opacity-90 active:scale-[0.99]"
+                } ${
+                  theme === "light"
+                    ? "bg-indigo-600 text-white"
+                    : "bg-indigo-500 text-white"
+                }`}
+              >
+                {loading ? "Analyzing PDF..." : "Analyze & Get Insights"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setFile(null);
+                  setPrompt("");
+                  setResponse("");
+                }}
+                className={`px-4 py-2.5 rounded-lg text-sm font-medium transition ${
+                  theme === "light"
+                    ? "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                }`}
+              >
+                Reset
+              </button>
+            </div>
+          </div>
+
+          {/* ✅ AI Response Area — scrollable like chat */}
+          {response && (
+            <div className="flex-1 overflow-y-auto rounded-xl border p-5">
+              <div className="flex items-start justify-between mb-3">
+                <h3
+                  className={`font-bold text-base ${
+                    theme === "light" ? "text-slate-800" : "text-indigo-300"
                   }`}
                 >
-                  {file.name}
+                  🩺 HealthMate Insights
+                </h3>
+                <span className="text-xs opacity-70 px-2 py-0.5 rounded bg-opacity-20">
+                  AI-generated
                 </span>
-              ) : (
-                "Click or drop a PDF file here"
-              )}
-            </p>
-          </label>
-
-          {/* Prompt Input */}
-          <textarea
-            rows="1"
-            placeholder="Ask about your medical report, lab results, or any PDF..."
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            className={`w-full rounded-xl p-5 resize-none text-lg focus:outline-none focus:ring-2 transition ${
-              theme === "light"
-                ? "border border-gray-300 focus:ring-indigo-400 bg-white text-gray-800"
-                : "border border-gray-700 focus:ring-indigo-500 bg-gray-800 text-gray-200"
-            }`}
-          />
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full py-4 rounded-xl font-medium text-lg transition-all duration-200 ${
-              loading
-                ? "opacity-70 cursor-not-allowed"
-                : "hover:scale-[1.02] active:scale-95"
-            } ${
-              theme === "light"
-                ? "bg-indigo-600 text-white hover:bg-indigo-700"
-                : "bg-indigo-500 text-white hover:bg-indigo-600"
-            }`}
-          >
-            {loading ? "Analyzing your PDF..." : "Upload & Ask Gemini"}
-          </button>
-        </form>
-
-        {/* AI Response */}
-        {response && (
-          <div
-            className={`mt-6 rounded-xl p-6 border max-h-[700px] overflow-y-auto transition-colors ${
-              theme === "light"
-                ? "bg-gray-50 border-gray-200"
-                : "bg-gray-800 border-gray-700"
-            }`}
-          >
-            <h3
-              className={`font-semibold mb-3 text-lg ${
-                theme === "light" ? "text-indigo-700" : "text-indigo-400"
-              }`}
-            >
-              🧠 Health Mate Medical Summary:
-            </h3>
-            <pre
-              className={`whitespace-pre-wrap text-lg leading-relaxed ${
-                theme === "light" ? "text-gray-800" : "text-gray-200"
-              }`}
-            >
-              {response}
-            </pre>
-          </div>
-        )}
+              </div>
+              <div
+                className={`text-sm leading-relaxed ${
+                  theme === "light" ? "text-slate-700" : "text-gray-200"
+                }`}
+                dangerouslySetInnerHTML={{ __html: formatAIResponse(response) }}
+              />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
