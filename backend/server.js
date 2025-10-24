@@ -46,7 +46,7 @@ mongoose
 const ai = new GoogleGenAI({
   apiKey: process.env.GOOGLE_API_KEY,
 });
-
+//Assalamualaikum
 // Gemini test route// backend/server.js (snippet)
 const upload = multer({ storage: multer.memoryStorage() }); // in-memory buffer
 
