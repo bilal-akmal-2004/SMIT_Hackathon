@@ -1,5 +1,5 @@
-// Home.jsx (UPDATED)
-import { useEffect, useState } from "react";
+// Home.jsx (with auto-close mobile menu)
+import { useEffect, useState, useRef } from "react"; // ✅ added useRef
 import { useNavigate } from "react-router-dom";
 import Gemini from "../components/Gemini.jsx";
 import GeminiPdf from "../components/GeminiPdf.jsx";
@@ -10,8 +10,30 @@ import { useTheme } from "../context/ThemeContext";
 const HomePage = () => {
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState("chat");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const { theme } = useTheme();
+
+  // ✅ Ref for the mobile menu
+  const menuRef = useRef(null);
+
+  // ✅ Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        mobileMenuOpen &&
+        menuRef.current &&
+        !menuRef.current.contains(event.target)
+      ) {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [mobileMenuOpen]);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -52,85 +74,167 @@ const HomePage = () => {
           : "bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 text-gray-100"
       }`}
     >
-      {/* Navbar - fixed height */}
+      {/* Navbar */}
       <nav
-        className={`shrink-0 backdrop-blur-md px-6 py-4 flex justify-between items-center border-b transition-all shadow-sm ${
+        className={`shrink-0 backdrop-blur-md px-4 sm:px-6 py-3 flex justify-between items-center border-b transition-all shadow-sm ${
           theme === "light"
             ? "bg-white/70 border-gray-200"
             : "bg-gray-900/70 border-gray-700"
         }`}
       >
-        <div className="flex items-center gap-4">
-          <div className="w-11 h-11 flex items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 text-white text-xl shadow-md">
+        {/* Logo */}
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 text-white text-lg shadow-md">
             🩺
           </div>
-          <div>
-            <h1 className="text-2xl font-extrabold tracking-tight leading-tight">
-              HealthMate AI
-            </h1>
-            <p className="text-xs opacity-80 mt-0.5">
-              Smarter conversations about your health
-            </p>
+          <div className="hidden sm:block">
+            <h1 className="text-xl font-bold">HealthMate AI</h1>
+            <p className="text-xs opacity-80 mt-0.5">Your health companion</p>
           </div>
         </div>
 
         {user && (
-          <div className="flex items-center gap-4">
-            <div className="hidden sm:flex flex-col items-end">
-              <span className="font-medium">{user.name}</span>
-              <span className="text-xs opacity-70">Member</span>
+          <div className="flex items-center gap-3">
+            {/* Desktop: Show buttons */}
+            <div className="hidden md:flex items-center gap-2">
+              <button
+                onClick={() => navigate("/dashboard")}
+                className={`px-3 py-1.5 rounded text-sm font-medium transition ${
+                  theme === "light"
+                    ? "bg-white border border-gray-300 text-gray-800 hover:bg-gray-50"
+                    : "bg-gray-800 border border-gray-700 text-gray-200 hover:bg-gray-700"
+                }`}
+              >
+                📊 Timeline
+              </button>
+              <button
+                onClick={() => navigate("/add-vitals")}
+                className={`px-3 py-1.5 rounded text-sm font-medium text-white transition ${
+                  theme === "light"
+                    ? "bg-indigo-600 hover:bg-indigo-700"
+                    : "bg-indigo-500 hover:bg-indigo-600"
+                }`}
+              >
+                ➕ Add Vital
+              </button>
             </div>
-            <button
-              onClick={logoutUser}
-              aria-label="Logout"
-              className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 active:scale-95 transition-shadow shadow"
-            >
-              Logout
-            </button>
+
+            {/* Mobile: Hamburger Menu */}
+            <div className="md:hidden relative" ref={menuRef}>
+              {" "}
+              {/* ✅ attach ref here */}
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className={`p-2 rounded-md ${
+                  theme === "light"
+                    ? "text-gray-700 hover:bg-gray-200"
+                    : "text-gray-300 hover:bg-gray-800"
+                }`}
+                aria-label="Menu"
+              >
+                ☰
+              </button>
+              {/* Mobile Dropdown Menu */}
+              {mobileMenuOpen && (
+                <div
+                  className={`absolute right-0 mt-2 w-48 rounded-lg shadow-lg py-2 z-50 ${
+                    theme === "light"
+                      ? "bg-white border border-gray-200"
+                      : "bg-gray-800 border border-gray-700"
+                  }`}
+                >
+                  <button
+                    onClick={() => {
+                      navigate("/dashboard");
+                      setMobileMenuOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    📊 Health Timeline
+                  </button>
+                  <button
+                    onClick={() => {
+                      navigate("/add-vitals");
+                      setMobileMenuOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    ➕ Add Manual Vital
+                  </button>
+                  <hr
+                    className={`my-1 ${
+                      theme === "light" ? "border-gray-200" : "border-gray-700"
+                    }`}
+                  />
+                  <button
+                    onClick={() => {
+                      logoutUser();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    🔐 Logout
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Desktop: User + Logout */}
+            <div className="hidden md:flex items-center gap-3">
+              <div className="flex flex-col items-end">
+                <span className="font-medium text-sm">{user.name}</span>
+                <span className="text-xs opacity-70">Member</span>
+              </div>
+              <button
+                onClick={logoutUser}
+                aria-label="Logout"
+                className="flex items-center gap-1 bg-indigo-600 text-white px-3 py-1.5 rounded font-medium text-sm hover:bg-indigo-700 transition"
+              >
+                Logout
+              </button>
+            </div>
           </div>
         )}
       </nav>
 
-      {/* Tab Switcher - fixed height */}
-      <div className="shrink-0 flex justify-center mt-4 px-4 mb-2">
+      {/* Tab Switcher */}
+      <div className="shrink-0 flex justify-center mt-3 px-4 mb-3">
         <div
-          className={`flex gap-2 p-1 rounded-full shadow-sm border transition ${
+          className={`flex gap-1 sm:gap-2 p-1 rounded-full shadow-sm border transition ${
             theme === "light"
               ? "bg-indigo-50 border-indigo-100"
               : "bg-gray-800 border-gray-700"
           }`}
         >
           {[
-            { id: "chat", label: "Chat Assistant", icon: "💬" },
-            { id: "pdf", label: "PDF Analyzer", icon: "📄" },
+            { id: "chat", label: "Chat", icon: "💬" },
+            { id: "pdf", label: "PDF", icon: "📄" },
           ].map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2 rounded-full text-sm sm:text-base font-semibold capitalize transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+              className={`flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 min-w-[80px] sm:min-w-[100px] ${
                 activeTab === tab.id
                   ? "bg-indigo-600 text-white shadow-md"
                   : theme === "light"
-                  ? "text-indigo-700 hover:bg-indigo-50"
+                  ? "text-indigo-700 hover:bg-indigo-100"
                   : "text-indigo-300 hover:bg-gray-700"
               }`}
               aria-pressed={activeTab === tab.id}
             >
-              <span className="mr-2">{tab.icon}</span>
-              <span className="hidden sm:inline">{tab.label}</span>
-              <span className="sm:hidden">{tab.icon}</span>
+              <span>{tab.icon}</span>
+              <span>{tab.label}</span>
             </button>
           ))}
         </div>
       </div>
 
-      {/* ✅ MAIN CONTENT: scrollable area is ONLY here */}
+      {/* Main Content */}
       <main className="flex-grow overflow-hidden px-4 sm:px-6">
         {activeTab === "chat" ? <Gemini /> : <GeminiPdf />}
       </main>
 
-      {/* Footer - fixed height */}
-      <footer className="shrink-0 text-center py-3 text-sm opacity-80 border-t">
+      <footer className="shrink-0 text-center py-3 text-xs sm:text-sm opacity-80 border-t">
         © {new Date().getFullYear()} HealthMate AI — Empowering Smarter Care
       </footer>
     </div>

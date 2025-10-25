@@ -6,7 +6,8 @@ import { ThemeToggle } from "./components/ThemeToggle";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import PageNotFound from "../src/pages/PageNotFound";
 import HomePage from "./pages/HomePage";
-
+import Dashboard from "../src/pages/DashBoard.jsx";
+import AddVitals from "../src/pages/AddVitals.jsx";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import ProtectedRoute from "./components/ProtectedRoute";
 export default function App() {
@@ -26,7 +27,10 @@ export default function App() {
     >
       <Router>
         <Routes>
+          {/* Public routes */}
           <Route path="/" element={<GoogleWrapper />} />
+
+          {/* Protected routes */}
           <Route
             path="/home"
             element={
@@ -35,6 +39,24 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/add-vitals"
+            element={
+              <ProtectedRoute>
+                <AddVitals />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Catch-all */}
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </Router>

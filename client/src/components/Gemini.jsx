@@ -14,6 +14,7 @@ const Gemini = () => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // In Gemini.jsx, replace handleSubmit with this:
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!prompt.trim()) return;
@@ -30,7 +31,8 @@ const Gemini = () => {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt }),
+          credentials: "include", // ✅ send cookies (for auth)
+          body: JSON.stringify({ messages: [...messages, userMessage] }), // ✅ send full history
         }
       );
 
@@ -54,14 +56,28 @@ const Gemini = () => {
 
     return (
       text
-        // Convert **bold** and __bold__
+        // 1. Remove standalone divider lines: *, **, ***, etc.
+        .replace(/^\s*\*{2,}\s*$/gm, "")
+        .replace(/^\s*\*\s*$/gm, "")
+
+        // 2. Remove Markdown headings (###, ##, #) but keep the text
+        .replace(/^#{1,3}\s*/gm, "")
+
+        // 3. Convert **bold** and __bold__
         .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
         .replace(/__(.*?)__/g, "<strong>$1</strong>")
-        // Convert *italic* and _italic_
-        .replace(/\*(.*?)\*/g, "<em>$1</em>")
-        .replace(/_(.*?)_/g, "<em>$1</em>")
-        // Convert line breaks to <br>
-        .replace(/\n/g, "<br />")
+
+        // 4. Convert *italic* (only when surrounded by word boundaries)
+        .replace(/\b\*(.*?)\*\b/g, "<em>$1</em>")
+
+        // 5. Replace double line breaks with paragraph breaks
+        .replace(/\n{2,}/g, "</p><p>")
+
+        // 6. Wrap everything in a paragraph with spacing
+        .replace(/^(.+)$/s, '<p class="mb-3">$1</p>')
+
+        // 7. Clean up empty paragraphs
+        .replace(/<p class="mb-3">\s*<\/p>/g, "")
     );
   };
 

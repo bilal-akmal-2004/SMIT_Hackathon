@@ -4,10 +4,13 @@ import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import { createRequire } from "module";
+// Add this near your other imports
+import { protect } from "./middleware/authMiddleware.js";
 const require = createRequire(import.meta.url);
 const pdfModule = require("pdf-parse");
 const pdfParse = pdfModule.default || pdfModule; // ✅ handles both CJS + ESM exports
-
+// Add near other routes
+import vitalRoutes from "./routes/vitalRoutes.js";
 import multer from "multer";
 import fs from "fs";
 import { GoogleGenAI } from "@google/genai"; // ✅ correct new import
@@ -52,66 +55,103 @@ const upload = multer({ storage: multer.memoryStorage() }); // in-memory buffer
 
 app.post("/api/gemini/pdf", upload.single("file"), async (req, res) => {
   try {
-    // safe import that handles both CJS and ESM shapes
-
-    // prompt from form-data
-    const prompt =
-      req.body?.prompt ||
-      "You are HealthMate, a virtual doctor. Summarize this PDF and give medical or lifestyle insights based on the content in not too long or not too short, but make the answer easy to read.";
-
-    if (!req.file || !req.file.buffer) {
-      return res.status(400).json({ error: "No PDF file uploaded" });
+    const userId = req.cookies?.userId; // ⚠️ You'll need to pass userId from frontend
+    if (!userId) {
+      return res.status(401).json({ error: "User not authenticated" });
     }
 
-    // parse PDF buffer
+    const prompt = req.body?.prompt || "You are HealthMate...";
+
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    // 1. Upload to Cloudinary
+    const cloudResult = await cloudinary.uploader
+      .upload_stream({ resource_type: "auto" }, (error, result) => {
+        if (error) throw error;
+        return result;
+      })
+      .end(req.file.buffer);
+
+    // 2. Parse PDF text
     const pdfData = await pdfParse(req.file.buffer);
-    const extractedText = pdfData.text || "";
+    const extractedText = pdfData.text.slice(0, 30000);
 
-    // limit size to avoid sending huge prompt (adjust as needed)
-    const chunk = extractedText.slice(0, 30000); // ~30k chars
-    const fullPrompt = `${prompt}\n\nPDF CONTENT:\n${chunk}`;
+    // 3. Save file record
+    const fileDoc = await File.create({
+      userId,
+      originalName: req.file.originalname,
+      cloudinaryUrl: cloudResult.secure_url,
+      fileType: req.file.mimetype.includes("pdf") ? "pdf" : "image",
+    });
 
-    // call Gemini (your ai client variable `ai` already set up)
-    const response = await ai.models.generateContent({
+    // 4. Send to Gemini
+    const fullPrompt = `${prompt}\n\nPDF CONTENT:\n${extractedText}`;
+    const geminiRes = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: fullPrompt,
     });
+    const aiText = geminiRes.text;
 
-    // return the text (adjust if response object differs)
-    res.json({ text: response.text });
-  } catch (error) {
-    console.error("Gemini PDF error:", error);
-    res.status(500).json({
-      error: "Something went wrong",
-      details: error.message,
+    // 5. TODO: Later, parse aiText into structured fields (for now, store as-is)
+    const insight = await AiInsight.create({
+      fileId: fileDoc._id,
+      userId,
+      englishSummary: aiText,
     });
+
+    res.json({
+      text: aiText,
+      fileId: fileDoc._id,
+      insightId: insight._id,
+      fileUrl: cloudResult.secure_url,
+    });
+  } catch (error) {
+    console.error("PDF Upload Error:", error);
+    res.status(500).json({ error: "Upload failed", details: error.message });
   }
 });
 
 // Simple text-based Gemini chat route
-app.post("/api/gemini", async (req, res) => {
+// Simple text-based Gemini chat route (WITH HISTORY)
+
+app.post("/api/gemini", protect, async (req, res) => {
   try {
-    const { prompt } = req.body;
-    if (!prompt) {
-      return res.status(400).json({ error: "Prompt is required" });
+    const { messages } = req.body; // Now expect full message array
+
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+      return res.status(400).json({ error: "Messages are required" });
     }
 
-    // 🧠 Doctor persona context
-    const doctorContext = `
-You are HealthMate, a friendly and knowledgeable virtual doctor. 
-Your tone should be caring, empathetic, and professional — similar to how a real doctor would talk to a patient.
-Always focus on promoting health, giving safe and evidence-based recommendations,
-and reminding users to consult a real healthcare professional before taking serious action.
-`;
+    // 🧠 Doctor persona context (only once at the start)
+    const doctorContext = `You are HealthMate, a friendly virtual doctor.
+Respond in clear, plain English with natural line breaks.
+Do NOT use Markdown syntax like ###, **, or * for formatting.
+Use bold only if absolutely necessary, and avoid lists if possible.
+Keep responses concise, empathetic, and easy to read.`;
 
-    const finalPrompt = `${doctorContext}\n\nUser: ${prompt}\n\nHealthMate Doctor:`;
+    // Format messages for Gemini
+    // Gemini expects: [{ role: "user", parts: "..." }, { role: "model", parts: "..." }]
+    const geminiMessages = messages.map((msg) => ({
+      role: msg.role === "user" ? "user" : "model",
+      parts: [{ text: msg.text }],
+    }));
+
+    // Add system instruction as first message (Gemini 1.5 supports this)
+    const contents = [
+      { role: "user", parts: [{ text: doctorContext }] },
+      ...geminiMessages,
+    ];
 
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
-      contents: finalPrompt,
+      contents: contents,
     });
 
-    res.json({ text: response.text || response.output_text || "No response" });
+    const aiText =
+      response.text || "I'm here to help! Could you clarify your question?";
+    res.json({ text: aiText });
   } catch (error) {
     console.error("Gemini chat error:", error);
     res.status(500).json({
@@ -123,6 +163,9 @@ and reminding users to consult a real healthcare professional before taking seri
 
 // Routes
 app.use("/api/auth", authRoutes);
+
+// vital routes
+app.use("/api/vitals", vitalRoutes);
 
 app.get("/", (req, res) => {
   res.send("Server is running.");
