@@ -1,7 +1,8 @@
+// client/src/pages/AuthForm.jsx
 import { useState } from "react";
 import { useGoogleLogin } from "@react-oauth/google";
 import Joi from "joi";
-import { useTheme } from "../context/ThemeContext"; // adjust path as needed
+import { useTheme } from "../context/ThemeContext";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import SetPasswordModal from "../components/SetPasswordModal.jsx";
@@ -10,16 +11,15 @@ import { googleAuth } from "../api.js";
 
 function AuthForm() {
   const navigate = useNavigate();
-
-  // this state is for when the use want to log in or he want to sign up
   const [formState, setFormState] = useState("Sign up");
   const [showModal, setShowModal] = useState(false);
-  const { theme } = useTheme(); // inside the AuthForm component
+  const { theme } = useTheme();
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    name: "", // using it in Sign Up
+    name: "",
   });
   const [errors, setErrors] = useState({});
 
@@ -39,9 +39,9 @@ function AuthForm() {
       setErrors(formattedErrors);
     } else {
       setErrors({});
+      setLoading(true);
       try {
         const url = formState === "Sign up" ? "/register" : "/login";
-
         const res = await axios.post(
           `${import.meta.env.VITE_API_BASE_URL}/api/auth${url}`,
           formData,
@@ -55,11 +55,12 @@ function AuthForm() {
         }
       } catch (err) {
         toast.error(err.response?.data?.msg || "Something went wrong");
+      } finally {
+        setLoading(false);
       }
     }
   };
 
-  // here is the scheme for the joi
   const schema = Joi.object({
     email: Joi.string()
       .email({ tlds: { allow: false } })
@@ -68,12 +69,10 @@ function AuthForm() {
         "string.empty": "This field is required.",
         "string.email": "Please enter a valid email address.",
       }),
-
     password: Joi.string().min(6).required().messages({
       "string.empty": "This field is required.",
       "string.min": "Password must be at least 6 characters long.",
     }),
-
     name:
       formState === "Sign up"
         ? Joi.string().min(3).required().messages({
@@ -83,27 +82,58 @@ function AuthForm() {
         : Joi.optional(),
   });
 
-  // this is for the google login using the googel button
-  //response google
   const responseGoogle = async (authResult) => {
-    try {
-      console.log(authResult);
-      if (authResult["code"]) {
-        const result = await googleAuth(authResult["code"]);
-        const { email, name } = result.data.user;
-        console.log("result data user : ", result.data.user);
+    if (authResult.code) {
+      setLoading(true);
+      try {
+        const result = await googleAuth(authResult.code);
+        toast.success("Google login successful!");
+        navigate("/home");
+      } catch (error) {
+        toast.error("Google login failed");
+        console.error("Google login error:", error);
+      } finally {
+        setLoading(false);
       }
-      console.log(authResult);
-      navigate("/home");
-    } catch (error) {
-      console.error("Error while requesting googel code: ", error);
     }
   };
+
   const googleLogin = useGoogleLogin({
     onSuccess: responseGoogle,
-    onError: responseGoogle,
+    onError: () => {
+      toast.error("Google login cancelled");
+    },
     flow: "auth-code",
   });
+
+  const LoadingSpinner = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-40 dark:bg-opacity-60 flex items-center justify-center z-50">
+      <div
+        className={`p-6 rounded-2xl shadow-xl ${
+          theme === "light" ? "bg-white" : "bg-gray-800"
+        }`}
+      >
+        <div className="flex flex-col items-center">
+          <div className="relative w-16 h-16 mb-4">
+            <div className="absolute inset-0 rounded-full border-4 border-indigo-200 dark:border-indigo-900"></div>
+            <div className="absolute inset-0 rounded-full border-4 border-t-indigo-600 dark:border-t-indigo-400 animate-spin"></div>
+            <div className="absolute inset-2 flex items-center justify-center text-2xl">
+              🩺
+            </div>
+          </div>
+          <p
+            className={`text-center font-medium ${
+              theme === "light" ? "text-gray-700" : "text-gray-300"
+            }`}
+          >
+            {formState === "Sign up"
+              ? "Creating your account..."
+              : "Logging you in..."}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div
@@ -111,8 +141,10 @@ function AuthForm() {
         theme === "light"
           ? "border-gray-300 bg-white text-black"
           : "border-gray-700 bg-gray-900 text-white"
-      } lg:w-1/2 xl:w-5/12 p-6 sm:p-12 rounded-2xl`}
+      } lg:w-1/2 xl:w-5/12 p-6 sm:p-12 rounded-2xl relative`}
     >
+      {loading && <LoadingSpinner />}
+
       <div className="mt-12 flex flex-col items-center">
         <h1 className="text-2xl xl:text-3xl font-extrabold">
           {formState === "Sign up" ? "Sign Up" : "Log in"}
@@ -123,13 +155,16 @@ function AuthForm() {
               <button
                 onClick={googleLogin}
                 type="button"
-                className={`w-full max-w-xs font-bold cursor-pointer shadow-sm rounded-lg py-3 flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline ${
-                  theme === "light"
-                    ? "bg-indigo-100 text-gray-800"
-                    : "bg-indigo-900 text-white"
+                disabled={loading}
+                className={`w-full max-w-xs font-bold cursor-pointer shadow-sm rounded-lg py-3 flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none ${
+                  loading
+                    ? "opacity-70 cursor-not-allowed"
+                    : theme === "light"
+                    ? "bg-indigo-100 text-gray-800 hover:bg-indigo-200"
+                    : "bg-indigo-900 text-white hover:bg-indigo-700"
                 }`}
               >
-                <div className="bg-white p-2 rounded-full ">
+                <div className="bg-white p-2 rounded-full">
                   <svg className="w-4" viewBox="0 0 533.5 544.3">
                     <path
                       d="M533.5 278.4c0-18.5-1.5-37.1-4.7-55.3H272.1v104.8h147c-6.1 33.8-25.7 63.7-54.4 82.7v68h87.7c51.5-47.4 81.1-117.4 81.1-200.2z"
@@ -156,7 +191,8 @@ function AuthForm() {
                 </span>
               </button>
             </div>
-            <div className="my-12 border-b text-center">
+
+            <div className="my-6 border-b text-center">
               <div
                 className={`leading-none px-2 inline-block text-sm tracking-wide font-medium transform translate-y-1/2 ${
                   theme === "light"
@@ -169,30 +205,31 @@ function AuthForm() {
                   : "Or log in with e-mail"}
               </div>
             </div>
+
             <div className="mx-auto max-w-xs">
               {formState === "Sign up" ? (
-                // this code here is for the sign up part
                 <>
-                  {" "}
                   <input
-                    className={`w-full px-8 py-4 rounded-lg font-medium text-sm focus:outline-none mt-5 ${
+                    className={`w-full px-4 py-3 rounded-lg font-medium text-sm focus:outline-none mt-4 ${
                       theme === "light"
                         ? "bg-gray-100 border border-gray-200 placeholder-gray-500 text-black focus:border-gray-400 focus:bg-white"
                         : "bg-gray-800 border border-gray-600 placeholder-gray-400 text-white focus:border-gray-400 focus:bg-gray-700"
                     }`}
                     type="text"
-                    placeholder="User Name"
+                    placeholder="Full Name"
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
+                    disabled={loading}
                   />
                   {errors.name && (
-                    <p className="text-red-500 text-sm flex justify-center">
+                    <p className="text-red-500 text-xs mt-1 text-center">
                       {errors.name}
                     </p>
                   )}
+
                   <input
-                    className={`w-full px-8 py-4 rounded-lg font-medium text-sm focus:outline-none mt-5 ${
+                    className={`w-full px-4 py-3 rounded-lg font-medium text-sm focus:outline-none mt-4 ${
                       theme === "light"
                         ? "bg-gray-100 border border-gray-200 placeholder-gray-500 text-black focus:border-gray-400 focus:bg-white"
                         : "bg-gray-800 border border-gray-600 placeholder-gray-400 text-white focus:border-gray-400 focus:bg-gray-700"
@@ -202,14 +239,16 @@ function AuthForm() {
                     placeholder="Email"
                     value={formData.email}
                     onChange={handleChange}
+                    disabled={loading}
                   />
                   {errors.email && (
-                    <p className="text-red-500 text-sm flex justify-center">
+                    <p className="text-red-500 text-xs mt-1 text-center">
                       {errors.email}
                     </p>
                   )}
+
                   <input
-                    className={`w-full px-8 py-4 rounded-lg font-medium text-sm focus:outline-none mt-5 ${
+                    className={`w-full px-4 py-3 rounded-lg font-medium text-sm focus:outline-none mt-4 ${
                       theme === "light"
                         ? "bg-gray-100 border border-gray-200 placeholder-gray-500 text-black focus:border-gray-400 focus:bg-white"
                         : "bg-gray-800 border border-gray-600 placeholder-gray-400 text-white focus:border-gray-400 focus:bg-gray-700"
@@ -219,51 +258,42 @@ function AuthForm() {
                     value={formData.password}
                     onChange={handleChange}
                     placeholder="Password"
+                    disabled={loading}
                   />
                   {errors.password && (
-                    <p className="text-red-500 text-sm flex justify-center">
+                    <p className="text-red-500 text-xs mt-1 text-center">
                       {errors.password}
                     </p>
                   )}
+
                   <button
-                    className={`mt-5 tracking-wide font-semibold w-full py-4 rounded-lg transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none ${
-                      theme === "light"
-                        ? "bg-indigo-500 text-gray-100 hover:bg-indigo-700"
-                        : "bg-indigo-900 text-white hover:bg-indigo-600"
+                    type="submit"
+                    disabled={loading}
+                    className={`mt-6 tracking-wide font-semibold w-full py-3 rounded-lg transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none ${
+                      loading
+                        ? "opacity-70 cursor-not-allowed"
+                        : theme === "light"
+                        ? "bg-indigo-600 text-white hover:bg-indigo-700"
+                        : "bg-indigo-500 text-white hover:bg-indigo-600"
                     }`}
                   >
                     <svg
-                      className="w-6 h-6 -ml-2"
+                      className="w-5 h-5 -ml-1"
                       fill="none"
                       stroke="currentColor"
                       strokeWidth={2}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
                     >
                       <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
                       <circle cx="8.5" cy={7} r={4} />
                       <path d="M20 8v6M23 11h-6" />
                     </svg>
-                    <span className="ml-3">Sign Up</span>
+                    <span className="ml-2">Sign Up</span>
                   </button>
-                  <p className="flex justify-center mt-4">
-                    Already have an account ?{" "}
-                    <button
-                      onClick={() => {
-                        setFormState("Log in");
-                        setFormData({ ...formData, name: "" });
-                      }}
-                      className="text-blue-400 cursor-pointer"
-                    >
-                      Click here
-                    </button>
-                  </p>{" "}
                 </>
               ) : (
                 <>
-                  {/* this code here for the log in part  */}{" "}
                   <input
-                    className={`w-full px-8 py-4 rounded-lg font-medium text-sm focus:outline-none mt-5 ${
+                    className={`w-full px-4 py-3 rounded-lg font-medium text-sm focus:outline-none mt-4 ${
                       theme === "light"
                         ? "bg-gray-100 border border-gray-200 placeholder-gray-500 text-black focus:border-gray-400 focus:bg-white"
                         : "bg-gray-800 border border-gray-600 placeholder-gray-400 text-white focus:border-gray-400 focus:bg-gray-700"
@@ -273,14 +303,16 @@ function AuthForm() {
                     placeholder="Email"
                     value={formData.email}
                     onChange={handleChange}
+                    disabled={loading}
                   />
                   {errors.email && (
-                    <p className="text-red-500 text-sm flex justify-center">
+                    <p className="text-red-500 text-xs mt-1 text-center">
                       {errors.email}
                     </p>
                   )}
+
                   <input
-                    className={`w-full px-8 py-4 rounded-lg font-medium text-sm focus:outline-none mt-5 ${
+                    className={`w-full px-4 py-3 rounded-lg font-medium text-sm focus:outline-none mt-4 ${
                       theme === "light"
                         ? "bg-gray-100 border border-gray-200 placeholder-gray-500 text-black focus:border-gray-400 focus:bg-white"
                         : "bg-gray-800 border border-gray-600 placeholder-gray-400 text-white focus:border-gray-400 focus:bg-gray-700"
@@ -290,43 +322,76 @@ function AuthForm() {
                     value={formData.password}
                     onChange={handleChange}
                     placeholder="Password"
+                    disabled={loading}
                   />
                   {errors.password && (
-                    <p className="text-red-500 text-sm flex justify-center">
+                    <p className="text-red-500 text-xs mt-1 text-center">
                       {errors.password}
                     </p>
                   )}
+
                   <button
-                    className={`mt-5 tracking-wide font-semibold w-full py-4 rounded-lg transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none ${
-                      theme === "light"
-                        ? "bg-indigo-500 text-gray-100 hover:bg-indigo-700"
-                        : "bg-indigo-900 text-white hover:bg-indigo-600"
+                    type="submit"
+                    disabled={loading}
+                    className={`mt-6 tracking-wide font-semibold w-full py-3 rounded-lg transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none ${
+                      loading
+                        ? "opacity-70 cursor-not-allowed"
+                        : theme === "light"
+                        ? "bg-indigo-600 text-white hover:bg-indigo-700"
+                        : "bg-indigo-500 text-white hover:bg-indigo-600"
                     }`}
                   >
-                    <span className="ml-3">Log in</span>
+                    <span>Log in</span>
                   </button>
-                  <p className="flex justify-center mt-4">
-                    Dont have an account ?{" "}
-                    <button
-                      onClick={() => setFormState("Sign up")}
-                      className="text-blue-400 cursor-pointer"
-                    >
-                      Click here
-                    </button>
-                  </p>{" "}
                 </>
               )}
+
+              {/* ✅ TOGGLE LINK — NOW OUTSIDE CONDITIONAL & ALWAYS VISIBLE */}
+              <p className="mt-5 text-center">
+                {formState === "Sign up" ? (
+                  <>
+                    Already have an account?{" "}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormState("Log in");
+                        setFormData({ ...formData, name: "" });
+                        setErrors({});
+                      }}
+                      className="text-indigo-600 cursor-pointer dark:text-indigo-400 font-medium hover:underline"
+                      disabled={loading}
+                    >
+                      Log in here
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    Don’t have an account?{" "}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormState("Sign up");
+                        setErrors({});
+                      }}
+                      className="text-indigo-600 cursor-pointer dark:text-indigo-400 font-medium hover:underline"
+                      disabled={loading}
+                    >
+                      Sign up here
+                    </button>
+                  </>
+                )}
+              </p>
 
               <p
                 className={`mt-6 text-xs text-center ${
                   theme === "light" ? "text-gray-600" : "text-gray-400"
                 }`}
               >
-                I agree to abide by templatana's
+                I agree to abide by templatana's{" "}
                 <a href="#" className="border-b border-gray-500 border-dotted">
                   Terms of Service
-                </a>
-                and its
+                </a>{" "}
+                and its{" "}
                 <a href="#" className="border-b border-gray-500 border-dotted">
                   Privacy Policy
                 </a>
@@ -335,6 +400,7 @@ function AuthForm() {
           </form>
         </div>
       </div>
+
       <SetPasswordModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}

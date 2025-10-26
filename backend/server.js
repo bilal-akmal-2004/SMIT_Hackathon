@@ -4,6 +4,10 @@ import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import { createRequire } from "module";
+import chatRoutes from "./routes/chatRoutes.js";
+import cloudinary from "./utils/cloudinary.js";
+import File from "./models/File.js";
+import AiInsight from "./models/AiInsight.js";
 // Add this near your other imports
 import { protect } from "./middleware/authMiddleware.js";
 const require = createRequire(import.meta.url);
@@ -166,6 +170,9 @@ app.use("/api/auth", authRoutes);
 
 // vital routes
 app.use("/api/vitals", vitalRoutes);
+
+// After vitalRoutes
+app.use("/api/chats", chatRoutes);
 
 app.get("/", (req, res) => {
   res.send("Server is running.");

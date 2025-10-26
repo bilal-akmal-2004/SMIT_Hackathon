@@ -1,27 +1,83 @@
-// Gemini.jsx (FINAL CLEAN VERSION)
+// Gemini.jsx (with chat persistence)
 import React, { useState, useRef, useEffect } from "react";
 import { useTheme } from "../context/ThemeContext";
+import axios from "axios";
 
 const Gemini = () => {
   const [prompt, setPrompt] = useState("");
   const [messages, setMessages] = useState([]);
+  const [chatId, setChatId] = useState(null); // track saved chat ID
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const { theme } = useTheme();
   const chatEndRef = useRef(null);
 
+  // Inside Gemini.jsx
+
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // In Gemini.jsx, replace handleSubmit with this:
+  // ✅ NEW: Load latest chat on mount
+  useEffect(() => {
+    const loadLatestChat = async () => {
+      try {
+        const res = await axios.get(
+          `${import.meta.env.VITE_API_BASE_URL}/api/chats/latest`,
+          { withCredentials: true }
+        );
+        if (res.data) {
+          setMessages(res.data.messages);
+          setChatId(res.data._id);
+        }
+      } catch (err) {
+        // No chat found or error — start fresh
+        console.log("No previous chat found. Starting new session.");
+      }
+    };
+
+    loadLatestChat();
+  }, []);
+
+  // Save chat to backend
+  const saveChat = async (msgs) => {
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/api/chats`,
+        { messages: msgs },
+        { withCredentials: true }
+      );
+      console.log("Chat saved:", res.data);
+      setChatId(res.data._id);
+    } catch (err) {
+      console.error("Failed to save chat:", err.response?.data || err.message);
+    }
+  };
+
+  // Delete current chat
+  const deleteChat = async () => {
+    if (chatId) {
+      try {
+        await axios.delete(
+          `${import.meta.env.VITE_API_BASE_URL}/api/chats/${chatId}`,
+          { withCredentials: true }
+        );
+      } catch (err) {
+        console.error("Failed to delete chat");
+      }
+    }
+    setMessages([]);
+    setChatId(null);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!prompt.trim()) return;
 
     setError("");
     const userMessage = { role: "user", text: prompt };
-    setMessages((prev) => [...prev, userMessage]);
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
     setPrompt("");
     setLoading(true);
 
@@ -31,8 +87,8 @@ const Gemini = () => {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          credentials: "include", // ✅ send cookies (for auth)
-          body: JSON.stringify({ messages: [...messages, userMessage] }), // ✅ send full history
+          credentials: "include",
+          body: JSON.stringify({ messages: newMessages }),
         }
       );
 
@@ -40,7 +96,13 @@ const Gemini = () => {
 
       const data = await res.json();
       const aiMessage = { role: "ai", text: data.text || "No response." };
-      setMessages((prev) => [...prev, aiMessage]);
+      const updatedMessages = [...newMessages, aiMessage];
+      setMessages(updatedMessages);
+
+      // ✅ Auto-save after first AI reply (if not already saved)
+      if (!chatId && updatedMessages.length >= 2) {
+        saveChat(updatedMessages);
+      }
     } catch (err) {
       console.error(err);
       setError("Something went wrong. Check your backend or network.");
@@ -49,40 +111,21 @@ const Gemini = () => {
     }
   };
 
-  // this is to format the ai reply
-  // Helper to convert basic Markdown-like syntax to HTML
   const formatAIResponse = (text) => {
     if (!text) return "";
-
-    return (
-      text
-        // 1. Remove standalone divider lines: *, **, ***, etc.
-        .replace(/^\s*\*{2,}\s*$/gm, "")
-        .replace(/^\s*\*\s*$/gm, "")
-
-        // 2. Remove Markdown headings (###, ##, #) but keep the text
-        .replace(/^#{1,3}\s*/gm, "")
-
-        // 3. Convert **bold** and __bold__
-        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-        .replace(/__(.*?)__/g, "<strong>$1</strong>")
-
-        // 4. Convert *italic* (only when surrounded by word boundaries)
-        .replace(/\b\*(.*?)\*\b/g, "<em>$1</em>")
-
-        // 5. Replace double line breaks with paragraph breaks
-        .replace(/\n{2,}/g, "</p><p>")
-
-        // 6. Wrap everything in a paragraph with spacing
-        .replace(/^(.+)$/s, '<p class="mb-3">$1</p>')
-
-        // 7. Clean up empty paragraphs
-        .replace(/<p class="mb-3">\s*<\/p>/g, "")
-    );
+    return text
+      .replace(/^\s*\*{2,}\s*$/gm, "")
+      .replace(/^\s*\*\s*$/gm, "")
+      .replace(/^#{1,3}\s*/gm, "")
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+      .replace(/__(.*?)__/g, "<strong>$1</strong>")
+      .replace(/\b\*(.*?)\*\b/g, "<em>$1</em>")
+      .replace(/\n{2,}/g, "</p><p>")
+      .replace(/^(.+)$/s, '<p class="mb-3">$1</p>')
+      .replace(/<p class="mb-3">\s*<\/p>/g, "");
   };
 
   return (
-    // ✅ Remove outer h-full div — let parent control height
     <div
       className={`flex flex-col h-full w-full overflow-hidden rounded-2xl border transition ${
         theme === "light"
@@ -90,14 +133,15 @@ const Gemini = () => {
           : "bg-gray-900 border-gray-800"
       }`}
     >
+      {/* Header with Delete Button */}
       <div
-        className={`shrink-0 p-4 text-center font-semibold border-b ${
+        className={`shrink-0 p-4 text-center font-semibold border-b flex justify-between items-center ${
           theme === "light"
             ? "text-indigo-700 border-gray-200"
             : "text-indigo-300 border-gray-800"
         }`}
       >
-        <div className="flex items-center justify-center gap-3">
+        <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-md bg-indigo-600 text-white flex items-center justify-center shadow-sm">
             🧠
           </div>
@@ -108,9 +152,20 @@ const Gemini = () => {
             </div>
           </div>
         </div>
+        {messages.length > 0 && (
+          <button
+            onClick={deleteChat}
+            className={`text-xs px-3 py-1 rounded-full ${
+              theme === "light"
+                ? "bg-red-100 text-red-700 hover:bg-red-200"
+                : "bg-red-900/30 text-red-400 hover:bg-red-900/50"
+            }`}
+          >
+            🗑️ Delete Chat
+          </button>
+        )}
       </div>
 
-      {/* ✅ This will scroll, and stay within bounds */}
       <div className="flex-1 p-4 overflow-y-auto space-y-4">
         {messages.length === 0 && !loading && (
           <div
@@ -142,7 +197,7 @@ const Gemini = () => {
             >
               {msg.role === "ai" ? (
                 <span
-                  className="whitespace-pre-line"
+                  className="leading-relaxed"
                   dangerouslySetInnerHTML={{
                     __html: formatAIResponse(msg.text),
                   }}

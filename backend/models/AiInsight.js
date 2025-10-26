@@ -13,13 +13,7 @@ const aiInsightSchema = new mongoose.Schema({
     required: true,
   },
   englishSummary: { type: String, required: true },
-  romanUrduSummary: { type: String }, // optional for now
-  doctorQuestions: [String],
-  recommendations: {
-    avoid: [String],
-    eat: [String],
-    remedies: [String],
-  },
+  romanUrduSummary: { type: String },
   createdAt: { type: Date, default: Date.now },
 });
 
