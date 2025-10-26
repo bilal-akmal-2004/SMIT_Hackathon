@@ -80,4 +80,29 @@ router.get("/latest", protect, async (req, res) => {
   }
 });
 
+// PUT /api/chats/:id — update existing chat
+router.put("/:id", protect, async (req, res) => {
+  try {
+    const { messages } = req.body;
+    if (!messages || !Array.isArray(messages)) {
+      return res.status(400).json({ error: "Messages are required" });
+    }
+
+    const chat = await Chat.findById(req.params.id);
+    if (!chat) return res.status(404).json({ error: "Chat not found" });
+    if (chat.userId.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ error: "Not authorized" });
+    }
+
+    chat.messages = messages;
+    chat.updatedAt = Date.now();
+    await chat.save();
+
+    res.json(chat);
+  } catch (error) {
+    console.error("Update chat error:", error);
+    res.status(500).json({ error: "Failed to update chat" });
+  }
+});
+
 export default router;

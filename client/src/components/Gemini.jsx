@@ -99,9 +99,22 @@ const Gemini = () => {
       const updatedMessages = [...newMessages, aiMessage];
       setMessages(updatedMessages);
 
-      // ✅ Auto-save after first AI reply (if not already saved)
-      if (!chatId && updatedMessages.length >= 2) {
-        saveChat(updatedMessages);
+      // ✅ Save or update chat
+      if (chatId) {
+        // Update existing chat
+        await axios.put(
+          `${import.meta.env.VITE_API_BASE_URL}/api/chats/${chatId}`,
+          { messages: updatedMessages },
+          { withCredentials: true }
+        );
+      } else if (updatedMessages.length >= 2) {
+        // Save new chat
+        const saveRes = await axios.post(
+          `${import.meta.env.VITE_API_BASE_URL}/api/chats`,
+          { messages: updatedMessages },
+          { withCredentials: true }
+        );
+        setChatId(saveRes.data._id);
       }
     } catch (err) {
       console.error(err);
