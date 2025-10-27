@@ -8,6 +8,9 @@ import PageNotFound from "../src/pages/PageNotFound";
 import HomePage from "./pages/HomePage";
 import Dashboard from "../src/pages/DashBoard.jsx";
 import AddVitals from "../src/pages/AddVitals.jsx";
+// In client/src/App.jsx
+import PdfList from "./pages/PdfList";
+import PdfViewer from "./pages/PdfViewer";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import ProtectedRoute from "./components/ProtectedRoute";
 export default function App() {
@@ -52,6 +55,23 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <AddVitals />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/pdfs"
+            element={
+              <ProtectedRoute>
+                <PdfList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/pdf/:id"
+            element={
+              <ProtectedRoute>
+                <PdfViewer />
               </ProtectedRoute>
             }
           />

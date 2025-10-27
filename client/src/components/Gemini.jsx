@@ -1,4 +1,3 @@
-// Gemini.jsx (with chat persistence)
 import React, { useState, useRef, useEffect } from "react";
 import { useTheme } from "../context/ThemeContext";
 import axios from "axios";
@@ -6,19 +5,18 @@ import axios from "axios";
 const Gemini = () => {
   const [prompt, setPrompt] = useState("");
   const [messages, setMessages] = useState([]);
-  const [chatId, setChatId] = useState(null); // track saved chat ID
+  const [chatId, setChatId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [responseLanguage, setResponseLanguage] = useState("en"); // 'en' or 'ur'
   const { theme } = useTheme();
   const chatEndRef = useRef(null);
-
-  // Inside Gemini.jsx
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // ✅ NEW: Load latest chat on mount
+  // Load latest chat
   useEffect(() => {
     const loadLatestChat = async () => {
       try {
@@ -31,15 +29,12 @@ const Gemini = () => {
           setChatId(res.data._id);
         }
       } catch (err) {
-        // No chat found or error — start fresh
         console.log("No previous chat found. Starting new session.");
       }
     };
-
     loadLatestChat();
   }, []);
 
-  // Save chat to backend
   const saveChat = async (msgs) => {
     try {
       const res = await axios.post(
@@ -47,14 +42,12 @@ const Gemini = () => {
         { messages: msgs },
         { withCredentials: true }
       );
-      console.log("Chat saved:", res.data);
       setChatId(res.data._id);
     } catch (err) {
       console.error("Failed to save chat:", err.response?.data || err.message);
     }
   };
 
-  // Delete current chat
   const deleteChat = async () => {
     if (chatId) {
       try {
@@ -88,7 +81,7 @@ const Gemini = () => {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
-          body: JSON.stringify({ messages: newMessages }),
+          body: JSON.stringify({ messages: newMessages, responseLanguage }),
         }
       );
 
@@ -99,16 +92,13 @@ const Gemini = () => {
       const updatedMessages = [...newMessages, aiMessage];
       setMessages(updatedMessages);
 
-      // ✅ Save or update chat
       if (chatId) {
-        // Update existing chat
         await axios.put(
           `${import.meta.env.VITE_API_BASE_URL}/api/chats/${chatId}`,
           { messages: updatedMessages },
           { withCredentials: true }
         );
       } else if (updatedMessages.length >= 2) {
-        // Save new chat
         const saveRes = await axios.post(
           `${import.meta.env.VITE_API_BASE_URL}/api/chats`,
           { messages: updatedMessages },
@@ -118,7 +108,7 @@ const Gemini = () => {
       }
     } catch (err) {
       console.error(err);
-      setError("Something went wrong. Check your backend or network.");
+      setError("Something went wrong.");
     } finally {
       setLoading(false);
     }
@@ -138,6 +128,10 @@ const Gemini = () => {
       .replace(/<p class="mb-3">\s*<\/p>/g, "");
   };
 
+  const toggleLanguage = () => {
+    setResponseLanguage((prev) => (prev === "en" ? "ur" : "en"));
+  };
+
   return (
     <div
       className={`flex flex-col h-full w-full overflow-hidden rounded-2xl border transition ${
@@ -146,7 +140,6 @@ const Gemini = () => {
           : "bg-gray-900 border-gray-800"
       }`}
     >
-      {/* Header with Delete Button */}
       <div
         className={`shrink-0 p-4 text-center font-semibold border-b flex justify-between items-center ${
           theme === "light"
@@ -161,22 +154,40 @@ const Gemini = () => {
           <div className="text-left">
             <div className="text-base font-semibold">HealthMate AI Chat</div>
             <div className="text-xs opacity-80 mt-0.5">
-              Get clear answers to your medical questions
+              {responseLanguage === "en"
+                ? "Replying in English"
+                : "Replying in Urdu"}
             </div>
           </div>
         </div>
-        {messages.length > 0 && (
+
+        <div className="flex gap-2">
+          {/* Language Toggle Button */}
           <button
-            onClick={deleteChat}
+            onClick={toggleLanguage}
             className={`text-xs px-3 py-1 rounded-full ${
               theme === "light"
-                ? "bg-red-100 text-red-700 hover:bg-red-200"
-                : "bg-red-900/30 text-red-400 hover:bg-red-900/50"
+                ? "bg-indigo-100 text-indigo-700 hover:bg-indigo-200"
+                : "bg-indigo-900/30 text-indigo-300 hover:bg-indigo-900/50"
             }`}
           >
-            🗑️ Delete Chat
+            {responseLanguage === "en" ? "English" : "اردو"}
           </button>
-        )}
+
+          {/* Delete Chat Button */}
+          {messages.length > 0 && (
+            <button
+              onClick={deleteChat}
+              className={`text-xs px-3 py-1 rounded-full ${
+                theme === "light"
+                  ? "bg-red-100 text-red-700 hover:bg-red-200"
+                  : "bg-red-900/30 text-red-400 hover:bg-red-900/50"
+              }`}
+            >
+              Delete Chat
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="flex-1 p-4 overflow-y-auto space-y-4">
@@ -186,7 +197,7 @@ const Gemini = () => {
               theme === "light" ? "text-gray-600" : "text-gray-400"
             }`}
           >
-            💬 Start a conversation with HealthMate — type a question below.
+            💬 Start a conversation with HealthMate AI
           </div>
         )}
 
@@ -248,7 +259,7 @@ const Gemini = () => {
       >
         <textarea
           rows="1"
-          placeholder="Type your message..."
+          placeholder="Type your health question..."
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
           required

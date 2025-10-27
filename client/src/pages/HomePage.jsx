@@ -98,6 +98,16 @@ const HomePage = () => {
             {/* Desktop: Show buttons */}
             <div className="hidden md:flex items-center gap-2">
               <button
+                onClick={() => navigate("/pdfs")}
+                className={`px-3 py-1.5 rounded text-sm font-medium transition ${
+                  theme === "light"
+                    ? "bg-white border border-gray-300 text-gray-800 hover:bg-gray-50"
+                    : "bg-gray-800 border border-gray-700 text-gray-200 hover:bg-gray-700"
+                }`}
+              >
+                📄 My Reports
+              </button>
+              <button
                 onClick={() => navigate("/dashboard")}
                 className={`px-3 py-1.5 rounded text-sm font-medium transition ${
                   theme === "light"
@@ -143,6 +153,16 @@ const HomePage = () => {
                       : "bg-gray-800 border border-gray-700"
                   }`}
                 >
+                  <button
+                    onClick={() => navigate("/pdfs")}
+                    className={`px-3 py-1.5 rounded text-sm font-medium transition ${
+                      theme === "light"
+                        ? "bg-white  border-gray-300 text-gray-800 hover:bg-gray-50"
+                        : "bg-gray-800  border-gray-700 text-gray-200 hover:bg-gray-700"
+                    }`}
+                  >
+                    📄 My Reports
+                  </button>
                   <button
                     onClick={() => {
                       navigate("/dashboard");

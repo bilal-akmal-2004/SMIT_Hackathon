@@ -1,4 +1,4 @@
-// GeminiPdf.jsx
+// client/src/components/GeminiPdf.jsx
 import React, { useState } from "react";
 import { useTheme } from "../context/ThemeContext";
 
@@ -11,39 +11,17 @@ const GeminiPDF = () => {
 
   const formatAIResponse = (text) => {
     if (!text) return "";
-
-    return (
-      text
-        // 1. Remove divider lines (*, **, ***, etc.)
-        .replace(/^\s*\*{2,}\s*$/gm, "")
-        .replace(/^\s*\*\s*$/gm, "")
-
-        // 2. Remove Markdown headings
-        .replace(/^#{1,3}\s*/gm, "")
-
-        // 3. Convert bullet points to paragraphs
-        .replace(/^(\s*)[-*+]\s+(.*$)/gm, "$1• $2")
-
-        // 4. Bold and italic
-        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-        .replace(/__(.*?)__/g, "<strong>$1</strong>")
-        .replace(/\b\*(.*?)\*\b/g, "<em>$1</em>")
-
-        // 5. Bold numbered list starters (1. Title: ...)
-        .replace(/^(\d+\.\s.*?:)/gm, "<strong>$1</strong>")
-
-        // 6. Split into paragraphs on 2+ newlines
-        .replace(/\n{2,}/g, '</p><p class="mb-4">')
-
-        // 7. Wrap first paragraph
-        .replace(/^/, '<p class="mb-4">')
-
-        // 8. Close final paragraph
-        .replace(/$/, "</p>")
-
-        // 9. Clean up empty paragraphs
-        .replace(/<p class="mb-4">\s*<\/p>/g, "")
-    );
+    return text
+      .replace(/^\s*\*{2,}\s*$/gm, "")
+      .replace(/^\s*\*\s*$/gm, "")
+      .replace(/^#{1,3}\s*/gm, "")
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+      .replace(/__(.*?)__/g, "<strong>$1</strong>")
+      .replace(/\b\*(.*?)\*\b/g, "<em>$1</em>")
+      .replace(/\n{2,}/g, '</p><p class="mb-4">')
+      .replace(/^/, '<p class="mb-4">')
+      .replace(/$/, "</p>")
+      .replace(/<p class="mb-4">\s*<\/p>/g, "");
   };
 
   const handleSubmit = async (e) => {
@@ -61,6 +39,7 @@ const GeminiPDF = () => {
         `${import.meta.env.VITE_API_BASE_URL}/api/gemini/pdf`,
         {
           method: "POST",
+          credentials: "include", // ✅ Essential for auth
           body: formData,
         }
       );
@@ -85,7 +64,6 @@ const GeminiPDF = () => {
           : "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-950"
       }`}
     >
-      {/* Main container with strict height control */}
       <div
         className={`flex flex-col h-full w-full overflow-hidden rounded-2xl border transition ${
           theme === "light"
@@ -93,7 +71,6 @@ const GeminiPDF = () => {
             : "bg-gray-900 border-gray-800"
         }`}
       >
-        {/* Header */}
         <div className="shrink-0 p-6 pb-4 border-b">
           <div className="flex items-start gap-4">
             <div className="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center bg-indigo-600 text-white text-xl shadow">
@@ -118,9 +95,7 @@ const GeminiPDF = () => {
           </div>
         </div>
 
-        {/* Scrollable content area: form + response */}
         <div className="flex-1 overflow-hidden p-4 flex flex-col gap-5">
-          {/* Upload & Prompt Form */}
           <div className="shrink-0 space-y-5">
             <label
               className={`flex flex-col items-center justify-center border-2 border-dashed rounded-xl p-5 cursor-pointer transition ${
@@ -215,7 +190,6 @@ const GeminiPDF = () => {
             </div>
           </div>
 
-          {/* ✅ AI Response Area — scrollable like chat */}
           {response && (
             <div className="flex-1 overflow-y-auto rounded-xl border p-5">
               <div className="flex items-start justify-between mb-3">
