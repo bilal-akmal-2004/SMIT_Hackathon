@@ -58,8 +58,10 @@ const SharedWithMe = () => {
       <div className="max-w-2xl mx-auto px-4 py-8">
         <button
           onClick={() => navigate("/home")}
-          className={`mb-6 flex items-center gap-2 text-sm font-medium ${
-            theme === "light" ? "text-gray-700" : "text-gray-300"
+          className={`mb-8 flex items-center gap-2 px-4 py-2 rounded-xl font-medium text-sm transition-all shadow-sm border ${
+            theme === "light"
+              ? "bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400"
+              : "bg-gray-800 text-gray-200 border-gray-700 hover:bg-gray-700 hover:border-gray-600"
           }`}
         >
           ← Back to Home

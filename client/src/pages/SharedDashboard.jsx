@@ -6,6 +6,7 @@ import { useTheme } from "../context/ThemeContext";
 
 const SharedDashboard = () => {
   const [owner, setOwner] = useState(null);
+  const [selectedPdf, setSelectedPdf] = useState(null);
   const [vitals, setVitals] = useState([]);
   const [pdfs, setPdfs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -104,17 +105,16 @@ const SharedDashboard = () => {
         <div className="flex items-center gap-3 mb-8">
           <button
             onClick={() => navigate("/shared-with-me")}
-            className={`p-2.5 rounded-lg ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium text-sm transition-all shadow-sm border ${
               theme === "light"
-                ? "bg-white text-gray-700 shadow-sm hover:bg-gray-100"
-                : "bg-gray-800 text-gray-200 hover:bg-gray-700"
+                ? "bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400"
+                : "bg-gray-800 text-gray-200 border-gray-700 hover:bg-gray-700 hover:border-gray-600"
             }`}
-            aria-label="Back"
           >
-            ←
+            ← Back
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-2xl font-bold ">
               {owner?.name}'s Shared Health Data
             </h1>
             <p
@@ -210,6 +210,7 @@ const SharedDashboard = () => {
         </section>
 
         {/* Reports Section */}
+        {/* Reports Section */}
         <section>
           <div className="flex justify-between items-center mb-4">
             <h2
@@ -220,12 +221,13 @@ const SharedDashboard = () => {
               📄 Medical Reports
             </h2>
           </div>
+
           {pdfs.length > 0 ? (
             <div className="space-y-4">
               {pdfs.map((pdf) => (
                 <div
                   key={pdf._id}
-                  onClick={() => handleViewPdf(pdf._id)}
+                  onClick={() => setSelectedPdf(pdf)}
                   className={`p-5 rounded-xl border cursor-pointer transition ${
                     theme === "light"
                       ? "bg-white border-gray-200 hover:bg-gray-50"
@@ -274,6 +276,96 @@ const SharedDashboard = () => {
               >
                 No reports uploaded yet.
               </p>
+            </div>
+          )}
+
+          {/* Modal */}
+          {selectedPdf && (
+            <div
+              className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
+              onClick={() => setSelectedPdf(null)}
+            >
+              <div
+                className={`w-full max-w-2xl rounded-2xl shadow-xl max-h-[90vh] overflow-y-auto ${
+                  theme === "light" ? "bg-white" : "bg-gray-800"
+                }`}
+                onClick={(e) => e.stopPropagation()} // prevent closing when clicking inside
+              >
+                {/* Modal Header */}
+                <div
+                  className={`flex justify-between items-center p-5 border-b ${
+                    theme === "light"
+                      ? "border-gray-200 bg-white"
+                      : "border-gray-700"
+                  }`}
+                >
+                  <div>
+                    <h3
+                      className={`text-lg font-bold ${
+                        theme === "light" ? "text-gray-900" : "text-white"
+                      }`}
+                    >
+                      {selectedPdf.originalName}
+                    </h3>
+                    <p
+                      className={`text-sm opacity-80 ${
+                        theme === "light" ? "text-gray-600" : "text-gray-400"
+                      }`}
+                    >
+                      Uploaded on{" "}
+                      {new Date(selectedPdf.uploadDate).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setSelectedPdf(null)}
+                    className={`w-8  h-8 rounded-full flex items-center justify-center ${
+                      theme === "light"
+                        ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                        : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                    }`}
+                    aria-label="Close"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                {/* Modal Body */}
+                <div className="p-5 ">
+                  {selectedPdf.insight ? (
+                    <div>
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="text-indigo-600 dark:text-indigo-400">
+                          🩺
+                        </span>
+                        <h4
+                          className={`font-semibold ${
+                            theme === "light"
+                              ? "text-gray-800"
+                              : "text-gray-200"
+                          }`}
+                        >
+                          HealthMate Insights
+                        </h4>
+                      </div>
+                      <div
+                        className={`text-sm leading-relaxed whitespace-pre-wrap ${
+                          theme === "light" ? "text-gray-700" : "text-gray-300"
+                        }`}
+                      >
+                        {selectedPdf.insight.englishSummary}
+                      </div>
+                    </div>
+                  ) : (
+                    <p
+                      className={
+                        theme === "light" ? "text-gray-600" : "text-gray-400"
+                      }
+                    >
+                      No AI insights available for this report.
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
           )}
         </section>
