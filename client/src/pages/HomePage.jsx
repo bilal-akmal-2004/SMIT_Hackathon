@@ -97,6 +97,27 @@ const HomePage = () => {
           <div className="flex items-center gap-3">
             {/* Desktop: Show buttons */}
             <div className="hidden md:flex items-center gap-2">
+              {/* In desktop buttons */}
+              <button
+                onClick={() => navigate("/shared-with-me")}
+                className={`px-3 py-1.5 rounded text-sm font-medium transition ${
+                  theme === "light"
+                    ? "bg-white border border-gray-300 text-gray-800 hover:bg-gray-50"
+                    : "bg-gray-800 border border-gray-700 text-gray-200 hover:bg-gray-700"
+                }`}
+              >
+                👥 Shared
+              </button>
+              <button
+                onClick={() => navigate("/search-members")}
+                className={`px-3 py-1.5 rounded text-sm font-medium transition ${
+                  theme === "light"
+                    ? "bg-white border border-gray-300 text-gray-800 hover:bg-gray-50"
+                    : "bg-gray-800 border border-gray-700 text-gray-200 hover:bg-gray-700"
+                }`}
+              >
+                👥 Share Data
+              </button>
               <button
                 onClick={() => navigate("/pdfs")}
                 className={`px-3 py-1.5 rounded text-sm font-medium transition ${
@@ -153,6 +174,25 @@ const HomePage = () => {
                       : "bg-gray-800 border border-gray-700"
                   }`}
                 >
+                  <button
+                    onClick={() => navigate("/shared-with-me")}
+                    className={`px-3 py-1.5 rounded text-sm font-medium transition ${
+                      theme === "light"
+                        ? "bg-white border border-gray-300 text-gray-800 hover:bg-gray-50"
+                        : "bg-gray-800 border border-gray-700 text-gray-200 hover:bg-gray-700"
+                    }`}
+                  >
+                    👥 Shared
+                  </button>
+                  <button
+                    onClick={() => {
+                      navigate("/search-members");
+                      setMobileMenuOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    👥 Share Health Data
+                  </button>
                   <button
                     onClick={() => navigate("/pdfs")}
                     className={`px-3 py-1.5 rounded text-sm font-medium transition ${

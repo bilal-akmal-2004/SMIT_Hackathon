@@ -8,7 +8,9 @@ import PageNotFound from "../src/pages/PageNotFound";
 import HomePage from "./pages/HomePage";
 import Dashboard from "../src/pages/DashBoard.jsx";
 import AddVitals from "../src/pages/AddVitals.jsx";
-// In client/src/App.jsx
+import SharedWithMe from "./pages/SharedWithMe";
+import SearchMembers from "./pages/SearchMembers";
+import SharedDashboard from "./pages/SharedDashboard";
 import PdfList from "./pages/PdfList";
 import PdfViewer from "./pages/PdfViewer";
 import { GoogleOAuthProvider } from "@react-oauth/google";
@@ -72,6 +74,31 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <PdfViewer />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/shared-with-me"
+            element={
+              <ProtectedRoute>
+                <SharedWithMe />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/search-members"
+            element={
+              <ProtectedRoute>
+                <SearchMembers />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/shared/:ownerId"
+            element={
+              <ProtectedRoute>
+                <SharedDashboard />
               </ProtectedRoute>
             }
           />

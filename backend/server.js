@@ -8,6 +8,7 @@ import chatRoutes from "./routes/chatRoutes.js";
 import File from "./models/File.js";
 import AiInsight from "./models/AiInsight.js";
 import pdfRoutes from "./routes/pdfRoutes.js";
+import shareRoutes from "./routes/shareRoutes.js";
 import { protect } from "./middleware/authMiddleware.js";
 
 const require = createRequire(import.meta.url);
@@ -162,7 +163,8 @@ HealthMate:`;
 app.use("/api/auth", authRoutes);
 app.use("/api/vitals", vitalRoutes);
 app.use("/api/chats", chatRoutes);
-app.use("/api/pdfs", pdfRoutes); // ✅ Must be after models are defined
+app.use("/api/pdfs", pdfRoutes);
+app.use("/api/share", shareRoutes);
 
 app.get("/", (req, res) => {
   res.send("Server is running.");
