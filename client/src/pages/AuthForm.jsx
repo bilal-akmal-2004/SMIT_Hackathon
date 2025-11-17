@@ -115,8 +115,8 @@ function AuthForm() {
       >
         <div className="flex flex-col items-center">
           <div className="relative w-16 h-16 mb-4">
-            <div className="absolute inset-0 rounded-full border-4 border-indigo-200 dark:border-indigo-900"></div>
-            <div className="absolute inset-0 rounded-full border-4 border-t-indigo-600 dark:border-t-indigo-400 animate-spin"></div>
+            <div className="absolute inset-0 rounded-full border-4 border-green-200 dark:border-green-900"></div>
+            <div className="absolute inset-0 rounded-full border-4 border-t-green-600 dark:border-t-green-400 animate-spin"></div>
             <div className="absolute inset-2 flex items-center justify-center text-2xl">
               🩺
             </div>
@@ -137,276 +137,275 @@ function AuthForm() {
 
   return (
     <div
-      className={`border ${
+      className={`min-h-screen flex items-center justify-center p-4 transition-colors duration-300 ${
         theme === "light"
-          ? "border-gray-300 bg-white text-black"
-          : "border-gray-700 bg-gray-900 text-white"
-      } lg:w-1/2 xl:w-5/12 p-6 sm:p-12 rounded-2xl relative`}
+          ? "bg-gradient-to-br from-green-50 to-white"
+          : "bg-gradient-to-br from-gray-900 to-gray-800"
+      }`}
     >
-      {loading && <LoadingSpinner />}
+      <div
+        className={`w-full max-w-md p-8 rounded-3xl shadow-2xl ${
+          theme === "light"
+            ? "bg-white border border-green-100"
+            : "bg-gray-800 border border-gray-700"
+        }`}
+      >
+        {loading && <LoadingSpinner />}
 
-      <div className="mt-12 flex flex-col items-center">
-        <h1 className="text-2xl xl:text-3xl font-extrabold">
-          {formState === "Sign up" ? "Sign Up" : "Log in"}
-        </h1>
-        <div className="w-full flex-1 mt-8">
-          <form onSubmit={handleSubmit}>
-            <div className="flex flex-col items-center">
-              <button
-                onClick={googleLogin}
-                type="button"
-                disabled={loading}
-                className={`w-full max-w-xs font-bold cursor-pointer shadow-sm rounded-lg py-3 flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none ${
-                  loading
-                    ? "opacity-70 cursor-not-allowed"
-                    : theme === "light"
-                    ? "bg-indigo-100 text-gray-800 hover:bg-indigo-200"
-                    : "bg-indigo-900 text-white hover:bg-indigo-700"
-                }`}
-              >
-                <div className="bg-white p-2 rounded-full">
-                  <svg className="w-4" viewBox="0 0 533.5 544.3">
-                    <path
-                      d="M533.5 278.4c0-18.5-1.5-37.1-4.7-55.3H272.1v104.8h147c-6.1 33.8-25.7 63.7-54.4 82.7v68h87.7c51.5-47.4 81.1-117.4 81.1-200.2z"
-                      fill="#4285f4"
-                    />
-                    <path
-                      d="M272.1 544.3c73.4 0 135.3-24.1 180.4-65.7l-87.7-68c-24.4 16.6-55.9 26-92.6 26-71 0-131.2-47.9-152.8-112.3H28.9v70.1c46.2 91.9 140.3 149.9 243.2 149.9z"
-                      fill="#34a853"
-                    />
-                    <path
-                      d="M119.3 324.3c-11.4-33.8-11.4-70.4 0-104.2V150H28.9c-38.6 76.9-38.6 167.5 0 244.4l90.4-70.1z"
-                      fill="#fbbc04"
-                    />
-                    <path
-                      d="M272.1 107.7c38.8-.6 76.3 14 104.4 40.8l77.7-77.7C405 24.6 339.7-.8 272.1 0 169.2 0 75.1 58 28.9 150l90.4 70.1c21.5-64.5 81.8-112.4 152.8-112.4z"
-                      fill="#ea4335"
-                    />
-                  </svg>
-                </div>
-                <span className="ml-4">
-                  {formState === "Sign up"
-                    ? "Sign Up with Google"
-                    : "Log in with Google"}
-                </span>
-              </button>
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center space-x-3 mb-4">
+            <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
+              <span className="text-white font-bold text-xl">H</span>
             </div>
+            <span
+              className={`text-3xl font-bold ${
+                theme === "light" ? "text-green-600" : "text-green-400"
+              }`}
+            >
+              HealthMate
+            </span>
+          </div>
+          <h1 className="text-2xl font-bold mb-2">
+            {formState === "Sign up" ? "Create Your Account" : "Welcome Back"}
+          </h1>
+          <p className={theme === "light" ? "text-gray-600" : "text-gray-300"}>
+            {formState === "Sign up"
+              ? "Join HealthMate and take control of your health"
+              : "Sign in to your HealthMate account"}
+          </p>
+        </div>
 
-            <div className="my-6 border-b text-center">
-              <div
-                className={`leading-none px-2 inline-block text-sm tracking-wide font-medium transform translate-y-1/2 ${
-                  theme === "light"
-                    ? "text-gray-600 bg-white"
-                    : "text-gray-300 bg-gray-800"
-                }`}
-              >
-                {formState === "Sign up"
-                  ? "Or sign up with e-mail"
-                  : "Or log in with e-mail"}
+        <form onSubmit={handleSubmit}>
+          {/* Google Button */}
+          <div className="mb-6">
+            <button
+              onClick={googleLogin}
+              type="button"
+              disabled={loading}
+              className={`w-full font-bold cursor-pointer shadow-sm rounded-xl py-4 flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none ${
+                loading
+                  ? "opacity-70 cursor-not-allowed"
+                  : theme === "light"
+                  ? "bg-gray-100 text-gray-800 hover:bg-gray-200 border border-gray-200"
+                  : "bg-gray-700 text-white hover:bg-gray-600 border border-gray-600"
+              }`}
+            >
+              <div className="bg-white p-1 rounded-full">
+                <svg className="w-5" viewBox="0 0 533.5 544.3">
+                  <path
+                    d="M533.5 278.4c0-18.5-1.5-37.1-4.7-55.3H272.1v104.8h147c-6.1 33.8-25.7 63.7-54.4 82.7v68h87.7c51.5-47.4 81.1-117.4 81.1-200.2z"
+                    fill="#4285f4"
+                  />
+                  <path
+                    d="M272.1 544.3c73.4 0 135.3-24.1 180.4-65.7l-87.7-68c-24.4 16.6-55.9 26-92.6 26-71 0-131.2-47.9-152.8-112.3H28.9v70.1c46.2 91.9 140.3 149.9 243.2 149.9z"
+                    fill="#34a853"
+                  />
+                  <path
+                    d="M119.3 324.3c-11.4-33.8-11.4-70.4 0-104.2V150H28.9c-38.6 76.9-38.6 167.5 0 244.4l90.4-70.1z"
+                    fill="#fbbc04"
+                  />
+                  <path
+                    d="M272.1 107.7c38.8-.6 76.3 14 104.4 40.8l77.7-77.7C405 24.6 339.7-.8 272.1 0 169.2 0 75.1 58 28.9 150l90.4 70.1c21.5-64.5 81.8-112.4 152.8-112.4z"
+                    fill="#ea4335"
+                  />
+                </svg>
               </div>
+              <span className="ml-3">
+                {formState === "Sign up"
+                  ? "Sign Up with Google"
+                  : "Log in with Google"}
+              </span>
+            </button>
+          </div>
+
+          {/* Divider */}
+          <div className="relative mb-6">
+            <div className="absolute inset-0 flex items-center">
+              <div
+                className={`w-full border-t ${
+                  theme === "light" ? "border-gray-300" : "border-gray-600"
+                }`}
+              ></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span
+                className={`px-2 ${
+                  theme === "light"
+                    ? "bg-white text-gray-500"
+                    : "bg-gray-800 text-gray-400"
+                }`}
+              >
+                Or continue with email
+              </span>
+            </div>
+          </div>
+
+          {/* Form Fields */}
+          <div className="space-y-4">
+            {formState === "Sign up" && (
+              <div>
+                <input
+                  className={`w-full px-4 py-3 rounded-xl font-medium text-sm focus:outline-none transition-all duration-300 ${
+                    theme === "light"
+                      ? "bg-gray-50 border border-gray-200 placeholder-gray-500 text-black focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-200"
+                      : "bg-gray-700 border border-gray-600 placeholder-gray-400 text-white focus:border-green-500 focus:bg-gray-600 focus:ring-2 focus:ring-green-900"
+                  }`}
+                  type="text"
+                  placeholder="Full Name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  disabled={loading}
+                />
+                {errors.name && (
+                  <p className="text-red-500 text-xs mt-2 ml-1">
+                    {errors.name}
+                  </p>
+                )}
+              </div>
+            )}
+
+            <div>
+              <input
+                className={`w-full px-4 py-3 rounded-xl font-medium text-sm focus:outline-none transition-all duration-300 ${
+                  theme === "light"
+                    ? "bg-gray-50 border border-gray-200 placeholder-gray-500 text-black focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-200"
+                    : "bg-gray-700 border border-gray-600 placeholder-gray-400 text-white focus:border-green-500 focus:bg-gray-600 focus:ring-2 focus:ring-green-900"
+                }`}
+                type="email"
+                name="email"
+                placeholder="Email"
+                value={formData.email}
+                onChange={handleChange}
+                disabled={loading}
+              />
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-2 ml-1">{errors.email}</p>
+              )}
             </div>
 
-            <div className="mx-auto max-w-xs">
+            <div>
+              <input
+                className={`w-full px-4 py-3 rounded-xl font-medium text-sm focus:outline-none transition-all duration-300 ${
+                  theme === "light"
+                    ? "bg-gray-50 border border-gray-200 placeholder-gray-500 text-black focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-200"
+                    : "bg-gray-700 border border-gray-600 placeholder-gray-400 text-white focus:border-green-500 focus:bg-gray-600 focus:ring-2 focus:ring-green-900"
+                }`}
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Password"
+                disabled={loading}
+              />
+              {errors.password && (
+                <p className="text-red-500 text-xs mt-2 ml-1">
+                  {errors.password}
+                </p>
+              )}
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className={`w-full py-4 rounded-xl font-semibold text-lg transition-all duration-300 ease-in-out flex items-center justify-center focus:outline-none mt-6 ${
+                loading
+                  ? "opacity-70 cursor-not-allowed"
+                  : theme === "light"
+                  ? "bg-green-500 text-white hover:bg-green-600 shadow-lg hover:shadow-xl"
+                  : "bg-green-600 text-white hover:bg-green-500 shadow-lg hover:shadow-xl"
+              }`}
+            >
               {formState === "Sign up" ? (
                 <>
-                  <input
-                    className={`w-full px-4 py-3 rounded-lg font-medium text-sm focus:outline-none mt-4 ${
-                      theme === "light"
-                        ? "bg-gray-100 border border-gray-200 placeholder-gray-500 text-black focus:border-gray-400 focus:bg-white"
-                        : "bg-gray-800 border border-gray-600 placeholder-gray-400 text-white focus:border-gray-400 focus:bg-gray-700"
-                    }`}
-                    type="text"
-                    placeholder="Full Name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    disabled={loading}
-                  />
-                  {errors.name && (
-                    <p className="text-red-500 text-xs mt-1 text-center">
-                      {errors.name}
-                    </p>
-                  )}
-
-                  <input
-                    className={`w-full px-4 py-3 rounded-lg font-medium text-sm focus:outline-none mt-4 ${
-                      theme === "light"
-                        ? "bg-gray-100 border border-gray-200 placeholder-gray-500 text-black focus:border-gray-400 focus:bg-white"
-                        : "bg-gray-800 border border-gray-600 placeholder-gray-400 text-white focus:border-gray-400 focus:bg-gray-700"
-                    }`}
-                    type="email"
-                    name="email"
-                    placeholder="Email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    disabled={loading}
-                  />
-                  {errors.email && (
-                    <p className="text-red-500 text-xs mt-1 text-center">
-                      {errors.email}
-                    </p>
-                  )}
-
-                  <input
-                    className={`w-full px-4 py-3 rounded-lg font-medium text-sm focus:outline-none mt-4 ${
-                      theme === "light"
-                        ? "bg-gray-100 border border-gray-200 placeholder-gray-500 text-black focus:border-gray-400 focus:bg-white"
-                        : "bg-gray-800 border border-gray-600 placeholder-gray-400 text-white focus:border-gray-400 focus:bg-gray-700"
-                    }`}
-                    type="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    placeholder="Password"
-                    disabled={loading}
-                  />
-                  {errors.password && (
-                    <p className="text-red-500 text-xs mt-1 text-center">
-                      {errors.password}
-                    </p>
-                  )}
-
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className={`mt-6 tracking-wide font-semibold w-full py-3 rounded-lg transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none ${
-                      loading
-                        ? "opacity-70 cursor-not-allowed"
-                        : theme === "light"
-                        ? "bg-indigo-600 text-white hover:bg-indigo-700"
-                        : "bg-indigo-500 text-white hover:bg-indigo-600"
-                    }`}
+                  <svg
+                    className="w-5 h-5 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
                   >
-                    <svg
-                      className="w-5 h-5 -ml-1"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                    >
-                      <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
-                      <circle cx="8.5" cy={7} r={4} />
-                      <path d="M20 8v6M23 11h-6" />
-                    </svg>
-                    <span className="ml-2">Sign Up</span>
+                    <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                    <circle cx="8.5" cy={7} r={4} />
+                    <path d="M20 8v6M23 11h-6" />
+                  </svg>
+                  Create Account
+                </>
+              ) : (
+                "Sign In"
+              )}
+            </button>
+          </div>
+
+          {/* Toggle Link */}
+          <div className="text-center mt-6">
+            <p
+              className={theme === "light" ? "text-gray-600" : "text-gray-300"}
+            >
+              {formState === "Sign up" ? (
+                <>
+                  Already have an account?{" "}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFormState("Log in");
+                      setFormData({ ...formData, name: "" });
+                      setErrors({});
+                    }}
+                    className={`font-medium hover:underline ${
+                      theme === "light" ? "text-green-600" : "text-green-400"
+                    }`}
+                    disabled={loading}
+                  >
+                    Sign in here
                   </button>
                 </>
               ) : (
                 <>
-                  <input
-                    className={`w-full px-4 py-3 rounded-lg font-medium text-sm focus:outline-none mt-4 ${
-                      theme === "light"
-                        ? "bg-gray-100 border border-gray-200 placeholder-gray-500 text-black focus:border-gray-400 focus:bg-white"
-                        : "bg-gray-800 border border-gray-600 placeholder-gray-400 text-white focus:border-gray-400 focus:bg-gray-700"
-                    }`}
-                    type="email"
-                    name="email"
-                    placeholder="Email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    disabled={loading}
-                  />
-                  {errors.email && (
-                    <p className="text-red-500 text-xs mt-1 text-center">
-                      {errors.email}
-                    </p>
-                  )}
-
-                  <input
-                    className={`w-full px-4 py-3 rounded-lg font-medium text-sm focus:outline-none mt-4 ${
-                      theme === "light"
-                        ? "bg-gray-100 border border-gray-200 placeholder-gray-500 text-black focus:border-gray-400 focus:bg-white"
-                        : "bg-gray-800 border border-gray-600 placeholder-gray-400 text-white focus:border-gray-400 focus:bg-gray-700"
-                    }`}
-                    type="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    placeholder="Password"
-                    disabled={loading}
-                  />
-                  {errors.password && (
-                    <p className="text-red-500 text-xs mt-1 text-center">
-                      {errors.password}
-                    </p>
-                  )}
-
+                  Don't have an account?{" "}
                   <button
-                    type="submit"
-                    disabled={loading}
-                    className={`mt-6 tracking-wide font-semibold w-full py-3 rounded-lg transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none ${
-                      loading
-                        ? "opacity-70 cursor-not-allowed"
-                        : theme === "light"
-                        ? "bg-indigo-600 text-white hover:bg-indigo-700"
-                        : "bg-indigo-500 text-white hover:bg-indigo-600"
+                    type="button"
+                    onClick={() => {
+                      setFormState("Sign up");
+                      setErrors({});
+                    }}
+                    className={`font-medium hover:underline ${
+                      theme === "light" ? "text-green-600" : "text-green-400"
                     }`}
+                    disabled={loading}
                   >
-                    <span>Log in</span>
+                    Create one here
                   </button>
                 </>
               )}
+            </p>
+          </div>
 
-              {/* ✅ TOGGLE LINK — NOW OUTSIDE CONDITIONAL & ALWAYS VISIBLE */}
-              <p className="mt-5 text-center">
-                {formState === "Sign up" ? (
-                  <>
-                    Already have an account?{" "}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setFormState("Log in");
-                        setFormData({ ...formData, name: "" });
-                        setErrors({});
-                      }}
-                      className="text-indigo-600 cursor-pointer dark:text-indigo-400 font-medium hover:underline"
-                      disabled={loading}
-                    >
-                      Log in here
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    Don’t have an account?{" "}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setFormState("Sign up");
-                        setErrors({});
-                      }}
-                      className="text-indigo-600 cursor-pointer dark:text-indigo-400 font-medium hover:underline"
-                      disabled={loading}
-                    >
-                      Sign up here
-                    </button>
-                  </>
-                )}
-              </p>
+          {/* Terms */}
+          <p
+            className={`mt-6 text-xs text-center ${
+              theme === "light" ? "text-gray-500" : "text-gray-400"
+            }`}
+          >
+            By continuing, you agree to HealthMate's{" "}
+            <a href="#" className="underline hover:no-underline">
+              Terms of Service
+            </a>{" "}
+            and{" "}
+            <a href="#" className="underline hover:no-underline">
+              Privacy Policy
+            </a>
+          </p>
+        </form>
 
-              <p
-                className={`mt-6 text-xs text-center ${
-                  theme === "light" ? "text-gray-600" : "text-gray-400"
-                }`}
-              >
-                I agree to abide by templatana's{" "}
-                <a href="#" className="border-b border-gray-500 border-dotted">
-                  Terms of Service
-                </a>{" "}
-                and its{" "}
-                <a href="#" className="border-b border-gray-500 border-dotted">
-                  Privacy Policy
-                </a>
-              </p>
-            </div>
-          </form>
-        </div>
+        <SetPasswordModal
+          isOpen={showModal}
+          onClose={() => setShowModal(false)}
+          email={formData.email}
+          theme={theme}
+        />
       </div>
-
-      <SetPasswordModal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        email={formData.email}
-        theme={theme}
-      />
     </div>
   );
 }

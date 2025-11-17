@@ -60,48 +60,49 @@ const GeminiPDF = () => {
     <div
       className={`w-full h-full flex flex-col transition-colors duration-300 ${
         theme === "light"
-          ? "bg-gradient-to-br from-indigo-50 via-white to-blue-50"
-          : "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-950"
+          ? "bg-gradient-to-br from-green-50 via-white to-emerald-50"
+          : "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900"
       }`}
     >
       <div
-        className={`flex flex-col h-full w-full overflow-hidden rounded-2xl border transition ${
+        className={`flex flex-col h-full w-full overflow-hidden rounded-2xl border transition-all duration-300 shadow-lg ${
           theme === "light"
-            ? "bg-white border-gray-200"
-            : "bg-gray-900 border-gray-800"
+            ? "bg-white border-green-200"
+            : "bg-gray-900 border-gray-700"
         }`}
       >
-        <div className="shrink-0 p-6 pb-4 border-b">
+        {/* Header */}
+        <div className="shrink-0 p-6 pb-4 border-b transition-all duration-300">
           <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center bg-indigo-600 text-white text-xl shadow">
-              🩺
+            <div className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br from-green-500 to-emerald-600 text-white text-xl shadow-md transition-all duration-300 hover:scale-110">
+              📄
             </div>
             <div className="flex-1">
               <h2
-                className={`text-xl font-bold ${
-                  theme === "light" ? "text-slate-800" : "text-indigo-300"
-                }`}
+                className={`text-xl font-bold text-green-700 dark:text-green-400`}
               >
                 Medical PDF Analyzer
               </h2>
               <p
                 className={`text-sm mt-1 ${
-                  theme === "light" ? "text-gray-600" : "text-gray-300"
+                  theme === "light" ? "text-green-600" : "text-green-300"
                 }`}
               >
-                Upload a report and get clear, actionable insights.
+                Upload medical reports and get AI-powered insights in simple
+                language
               </p>
             </div>
           </div>
         </div>
 
-        <div className="flex-1 overflow-hidden p-4 flex flex-col gap-5">
-          <div className="shrink-0 space-y-5">
+        <div className="flex-1 overflow-hidden p-6 flex flex-col gap-6">
+          {/* Upload Section */}
+          <div className="shrink-0 space-y-6">
             <label
-              className={`flex flex-col items-center justify-center border-2 border-dashed rounded-xl p-5 cursor-pointer transition ${
+              className={`flex flex-col items-center justify-center border-2 border-dashed rounded-2xl p-8 cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-md ${
                 theme === "light"
-                  ? "border-indigo-200 hover:border-indigo-300 bg-indigo-50/40"
-                  : "border-indigo-600 hover:border-indigo-500 bg-gray-800/50"
+                  ? "border-green-300 hover:border-green-400 bg-green-50/60"
+                  : "border-green-600 hover:border-green-500 bg-gray-800/50"
               }`}
             >
               <input
@@ -113,64 +114,104 @@ const GeminiPDF = () => {
               <div className="text-center">
                 {file ? (
                   <div className="text-sm">
+                    <div className="text-3xl mb-2">✅</div>
                     <span
-                      className={`font-medium ${
-                        theme === "light"
-                          ? "text-indigo-700"
-                          : "text-indigo-300"
+                      className={`font-semibold ${
+                        theme === "light" ? "text-green-700" : "text-green-300"
                       }`}
                     >
                       {file.name}
                     </span>
-                    <div className="text-xs mt-1 opacity-80">
-                      Click to change
+                    <div
+                      className={`text-xs mt-2 ${
+                        theme === "light" ? "text-green-600" : "text-green-400"
+                      }`}
+                    >
+                      Click to change file
                     </div>
                   </div>
                 ) : (
                   <>
+                    <div className="text-4xl mb-3">📎</div>
                     <p
-                      className={`font-medium ${
-                        theme === "light" ? "text-gray-700" : "text-gray-300"
+                      className={`font-semibold text-lg mb-2 ${
+                        theme === "light" ? "text-green-700" : "text-green-300"
                       }`}
                     >
-                      📎 Upload Medical Report (PDF)
+                      Upload Medical Report
                     </p>
-                    <p className="text-xs mt-1 opacity-70">
-                      Lab results, prescriptions, or doctor's notes
+                    <p
+                      className={`text-sm ${
+                        theme === "light" ? "text-green-600" : "text-green-400"
+                      }`}
+                    >
+                      Lab results, prescriptions, doctor's notes, or medical
+                      reports
+                    </p>
+                    <p
+                      className={`text-xs mt-2 ${
+                        theme === "light" ? "text-green-500" : "text-green-500"
+                      }`}
+                    >
+                      Supports PDF files only
                     </p>
                   </>
                 )}
               </div>
             </label>
 
-            <textarea
-              rows="2"
-              placeholder="E.g., What do my lab results mean? Should I be concerned about anything?"
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              className={`w-full rounded-xl p-3 text-sm focus:outline-none focus:ring-2 transition ${
-                theme === "light"
-                  ? "border border-gray-300 bg-gray-50 focus:ring-indigo-400 text-slate-800"
-                  : "border border-gray-700 bg-gray-800 focus:ring-indigo-500 text-gray-200"
-              }`}
-            />
+            {/* Prompt Input */}
+            <div className="space-y-3">
+              <label
+                className={`block text-sm font-medium ${
+                  theme === "light" ? "text-green-700" : "text-green-300"
+                }`}
+              >
+                💭 What would you like to know about this report?
+              </label>
+              <textarea
+                rows="3"
+                placeholder="Examples: 
+• What do my lab results mean?
+• Should I be concerned about any values?
+• Explain this medical report in simple terms
+• What questions should I ask my doctor?"
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                className={`w-full rounded-xl p-4 text-sm focus:outline-none focus:ring-2 transition-all duration-300 resize-none ${
+                  theme === "light"
+                    ? "border border-green-300 bg-green-50 focus:ring-green-400 focus:border-green-400 text-gray-800 placeholder-green-500 hover:border-green-400"
+                    : "border border-gray-600 bg-gray-800 focus:ring-green-500 focus:border-green-500 text-gray-200 placeholder-green-400 hover:border-gray-500"
+                }`}
+              />
+            </div>
 
+            {/* Action Buttons */}
             <div className="flex gap-3">
               <button
                 type="submit"
                 onClick={handleSubmit}
                 disabled={loading || !file}
-                className={`flex-1 py-2.5 rounded-lg font-medium text-sm transition ${
+                className={`flex-1 py-3.5 rounded-xl font-medium text-sm transition-all duration-300 ${
                   loading || !file
                     ? "opacity-60 cursor-not-allowed"
-                    : "hover:bg-opacity-90 active:scale-[0.99]"
+                    : "hover:scale-105 hover:shadow-lg active:scale-95"
                 } ${
                   theme === "light"
-                    ? "bg-indigo-600 text-white"
-                    : "bg-indigo-500 text-white"
+                    ? "bg-green-600 text-white border border-green-600 hover:bg-green-700"
+                    : "bg-green-600 text-white border border-green-600 hover:bg-green-500"
                 }`}
               >
-                {loading ? "Analyzing PDF..." : "Analyze & Get Insights"}
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Analyzing PDF...
+                  </span>
+                ) : (
+                  <span className="flex items-center justify-center gap-2">
+                    🔍 Analyze & Get Insights
+                  </span>
+                )}
               </button>
               <button
                 type="button"
@@ -179,37 +220,98 @@ const GeminiPDF = () => {
                   setPrompt("");
                   setResponse("");
                 }}
-                className={`px-4 py-2.5 rounded-lg text-sm font-medium transition ${
+                className={`px-6 py-3.5 rounded-xl text-sm font-medium transition-all duration-300 hover:scale-105 ${
                   theme === "light"
-                    ? "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                    : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                    ? "bg-green-100 text-green-700 border border-green-200 hover:bg-green-200 hover:border-green-300"
+                    : "bg-gray-800 text-green-300 border border-gray-700 hover:bg-gray-700 hover:border-gray-600"
                 }`}
               >
-                Reset
+                🔄 Reset
               </button>
             </div>
           </div>
 
+          {/* Response Section */}
           {response && (
-            <div className="flex-1 overflow-y-auto rounded-xl border p-5">
-              <div className="flex items-start justify-between mb-3">
-                <h3
-                  className={`font-bold text-base ${
-                    theme === "light" ? "text-slate-800" : "text-indigo-300"
+            <div
+              className={`flex-1 overflow-y-auto rounded-2xl border p-6 transition-all duration-300 hover:shadow-lg ${
+                theme === "light"
+                  ? "bg-green-50 border-green-200 hover:border-green-300"
+                  : "bg-gray-800 border-gray-700 hover:border-gray-600"
+              }`}
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="text-2xl">🤖</div>
+                  <div>
+                    <h3
+                      className={`font-bold text-lg text-green-700 dark:text-green-400`}
+                    >
+                      HealthMate AI Insights
+                    </h3>
+                    <p
+                      className={`text-xs ${
+                        theme === "light" ? "text-green-600" : "text-green-400"
+                      }`}
+                    >
+                      Based on your medical report analysis
+                    </p>
+                  </div>
+                </div>
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    theme === "light"
+                      ? "bg-green-100 text-green-700 border border-green-200"
+                      : "bg-green-900/50 text-green-300 border border-green-800"
                   }`}
                 >
-                  🩺 HealthMate Insights
-                </h3>
-                <span className="text-xs opacity-70 px-2 py-0.5 rounded bg-opacity-20">
                   AI-generated
                 </span>
               </div>
               <div
-                className={`text-sm leading-relaxed ${
-                  theme === "light" ? "text-slate-700" : "text-gray-200"
+                className={`text-sm leading-relaxed space-y-4 ${
+                  theme === "light" ? "text-gray-700" : "text-gray-200"
                 }`}
                 dangerouslySetInnerHTML={{ __html: formatAIResponse(response) }}
               />
+            </div>
+          )}
+
+          {/* Tips Section - Fixed text wrapping */}
+          {!response && (
+            <div
+              className={` rounded-2xl p-5 transition-all duration-300 hover:shadow-md ${
+                theme === "light"
+                  ? "bg-green-50 border border-green-200 hover:border-green-300"
+                  : "bg-gray-800 border border-gray-700 hover:border-gray-600"
+              }`}
+            >
+              <h4
+                className={`font-semibold mb-3 flex items-center gap-2 ${
+                  theme === "light" ? "text-green-700" : "text-green-400"
+                }`}
+              >
+                💡 Tips for Best Results
+              </h4>
+              <ul
+                className={`text-xs space-y-2 ${
+                  theme === "light" ? "text-green-600" : "text-green-300"
+                }`}
+              >
+                <li className="break-words leading-5">
+                  • Upload clear, readable PDFs of lab reports or medical
+                  documents
+                </li>
+                <li className="break-words leading-5">
+                  • Ask specific questions about abnormal values or concerns
+                </li>
+                <li className="break-words leading-5">
+                  • Request explanations in simple, easy-to-understand language
+                </li>
+                <li className="break-words leading-5">
+                  • Ask for questions to discuss with your healthcare provider
+                </li>
+              </ul>
             </div>
           )}
         </div>

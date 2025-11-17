@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { ToastContainer } from "react-toastify";
 import AuthForm from "./pages/AuthForm";
+import LandingPage from "./pages/LandingPage";
 import { useTheme } from "./context/ThemeContext";
 import { ThemeToggle } from "./components/ThemeToggle";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
@@ -15,6 +16,7 @@ import PdfList from "./pages/PdfList";
 import PdfViewer from "./pages/PdfViewer";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import ProtectedRoute from "./components/ProtectedRoute";
+
 export default function App() {
   const { theme } = useTheme();
 
@@ -26,14 +28,15 @@ export default function App() {
 
   return (
     <div
-      className={`flex justify-center items-center h-screen  transition-all duration-700 ${
-        theme === "light" ? "bg-white text-black " : "bg-black text-white"
+      className={` min-h-screen transition-all duration-700 ${
+        theme === "light" ? "bg-white text-black" : "bg-black text-white"
       }`}
     >
       <Router>
         <Routes>
           {/* Public routes */}
-          <Route path="/" element={<GoogleWrapper />} />
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/auth" element={<GoogleWrapper />} />
 
           {/* Protected routes */}
           <Route

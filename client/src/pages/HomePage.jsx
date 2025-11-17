@@ -70,26 +70,28 @@ const HomePage = () => {
     <div
       className={`flex flex-col h-screen w-full transition-colors duration-500 ${
         theme === "light"
-          ? "bg-gradient-to-br from-sky-50 via-white to-indigo-50 text-slate-900"
-          : "bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 text-gray-100"
+          ? "bg-gradient-to-br from-green-50 via-white to-emerald-50 text-gray-800"
+          : "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-100"
       }`}
     >
-      {/* Navbar */}
+      {/* Navbar - Made more compact */}
       <nav
-        className={`shrink-0 backdrop-blur-md px-4 sm:px-6 py-3 flex justify-between items-center border-b transition-all shadow-sm ${
+        className={`shrink-0 backdrop-blur-md px-4 sm:px-6 py-2 flex justify-between items-center border-b transition-all shadow-sm ${
           theme === "light"
-            ? "bg-white/70 border-gray-200"
-            : "bg-gray-900/70 border-gray-700"
+            ? "bg-white/80 border-green-200"
+            : "bg-gray-900/80 border-gray-700"
         }`}
       >
         {/* Logo */}
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 text-white text-lg shadow-md">
-            🩺
+          <div className="w-9 h-9 flex items-center justify-center rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 text-white text-lg shadow-md">
+            ❤️
           </div>
           <div className="hidden sm:block">
-            <h1 className="text-xl font-bold">HealthMate AI</h1>
-            <p className="text-xs opacity-80 mt-0.5">Your health companion</p>
+            <h1 className="text-lg font-bold text-green-700 dark:text-green-400">
+              HealthMate
+            </h1>
+            <p className="text-xs opacity-80 mt-0.5">Sehat ka Smart Dost</p>
           </div>
         </div>
 
@@ -97,53 +99,52 @@ const HomePage = () => {
           <div className="flex items-center gap-3">
             {/* Desktop: Show buttons */}
             <div className="hidden md:flex items-center gap-2">
-              {/* In desktop buttons */}
               <button
                 onClick={() => navigate("/shared-with-me")}
-                className={`px-3 py-1.5 rounded text-sm font-medium transition ${
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
                   theme === "light"
-                    ? "bg-white border border-gray-300 text-gray-800 hover:bg-gray-50"
-                    : "bg-gray-800 border border-gray-700 text-gray-200 hover:bg-gray-700"
+                    ? "bg-green-50 border border-green-200 text-green-700 hover:bg-green-100"
+                    : "bg-gray-800 border border-gray-700 text-green-300 hover:bg-gray-700"
                 }`}
               >
-                👥 Shared
+                🔄 Shared
               </button>
               <button
                 onClick={() => navigate("/search-members")}
-                className={`px-3 py-1.5 rounded text-sm font-medium transition ${
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
                   theme === "light"
-                    ? "bg-white border border-gray-300 text-gray-800 hover:bg-gray-50"
-                    : "bg-gray-800 border border-gray-700 text-gray-200 hover:bg-gray-700"
+                    ? "bg-green-50 border border-green-200 text-green-700 hover:bg-green-100"
+                    : "bg-gray-800 border border-gray-700 text-green-300 hover:bg-gray-700"
                 }`}
               >
-                👥 Share Data
+                🤝 Share Data
               </button>
               <button
                 onClick={() => navigate("/pdfs")}
-                className={`px-3 py-1.5 rounded text-sm font-medium transition ${
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
                   theme === "light"
-                    ? "bg-white border border-gray-300 text-gray-800 hover:bg-gray-50"
-                    : "bg-gray-800 border border-gray-700 text-gray-200 hover:bg-gray-700"
+                    ? "bg-green-50 border border-green-200 text-green-700 hover:bg-green-100"
+                    : "bg-gray-800 border border-gray-700 text-green-300 hover:bg-gray-700"
                 }`}
               >
-                📄 My Reports
+                📋 My Reports
               </button>
               <button
                 onClick={() => navigate("/dashboard")}
-                className={`px-3 py-1.5 rounded text-sm font-medium transition ${
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
                   theme === "light"
-                    ? "bg-white border border-gray-300 text-gray-800 hover:bg-gray-50"
-                    : "bg-gray-800 border border-gray-700 text-gray-200 hover:bg-gray-700"
+                    ? "bg-green-50 border border-green-200 text-green-700 hover:bg-green-100"
+                    : "bg-gray-800 border border-gray-700 text-green-300 hover:bg-gray-700"
                 }`}
               >
-                📊 Timeline
+                📈 Timeline
               </button>
               <button
                 onClick={() => navigate("/add-vitals")}
-                className={`px-3 py-1.5 rounded text-sm font-medium text-white transition ${
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium text-white transition ${
                   theme === "light"
-                    ? "bg-indigo-600 hover:bg-indigo-700"
-                    : "bg-indigo-500 hover:bg-indigo-600"
+                    ? "bg-green-600 hover:bg-green-700 shadow-md"
+                    : "bg-green-600 hover:bg-green-500 shadow-md"
                 }`}
               >
                 ➕ Add Vital
@@ -152,88 +153,87 @@ const HomePage = () => {
 
             {/* Mobile: Hamburger Menu */}
             <div className="md:hidden relative" ref={menuRef}>
-              {" "}
-              {/* ✅ attach ref here */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className={`p-2 rounded-md ${
                   theme === "light"
-                    ? "text-gray-700 hover:bg-gray-200"
+                    ? "text-gray-700 hover:bg-green-100"
                     : "text-gray-300 hover:bg-gray-800"
                 }`}
                 aria-label="Menu"
               >
-                ☰
+                ≡
               </button>
               {/* Mobile Dropdown Menu */}
               {mobileMenuOpen && (
                 <div
                   className={`absolute right-0 mt-2 w-48 rounded-lg shadow-lg py-2 z-50 ${
                     theme === "light"
-                      ? "bg-white border border-gray-200"
+                      ? "bg-white border border-green-200"
                       : "bg-gray-800 border border-gray-700"
                   }`}
                 >
                   <button
-                    onClick={() => navigate("/shared-with-me")}
-                    className={`px-3 py-1.5 rounded text-sm font-medium transition ${
-                      theme === "light"
-                        ? "bg-white border border-gray-300 text-gray-800 hover:bg-gray-50"
-                        : "bg-gray-800 border border-gray-700 text-gray-200 hover:bg-gray-700"
-                    }`}
+                    onClick={() => {
+                      navigate("/shared-with-me");
+                      setMobileMenuOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm hover:bg-green-50 dark:hover:bg-gray-700"
                   >
-                    👥 Shared
+                    🔄 Shared Reports
                   </button>
                   <button
                     onClick={() => {
                       navigate("/search-members");
                       setMobileMenuOpen(false);
                     }}
-                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                    className="w-full text-left px-4 py-2 text-sm hover:bg-green-50 dark:hover:bg-gray-700"
                   >
-                    👥 Share Health Data
+                    🤝 Share Health Data
                   </button>
                   <button
-                    onClick={() => navigate("/pdfs")}
-                    className={`px-3 py-1.5 rounded text-sm font-medium transition ${
-                      theme === "light"
-                        ? "bg-white  border-gray-300 text-gray-800 hover:bg-gray-50"
-                        : "bg-gray-800  border-gray-700 text-gray-200 hover:bg-gray-700"
-                    }`}
+                    onClick={() => {
+                      navigate("/pdfs");
+                      setMobileMenuOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm hover:bg-green-50 dark:hover:bg-gray-700"
                   >
-                    📄 My Reports
+                    📋 My Reports
                   </button>
                   <button
                     onClick={() => {
                       navigate("/dashboard");
                       setMobileMenuOpen(false);
                     }}
-                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                    className="w-full text-left px-4 py-2 text-sm hover:bg-green-50 dark:hover:bg-gray-700"
                   >
-                    📊 Health Timeline
+                    📈 Health Timeline
                   </button>
                   <button
                     onClick={() => {
                       navigate("/add-vitals");
                       setMobileMenuOpen(false);
                     }}
-                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                    className="w-full text-left px-4 py-2 text-sm hover:bg-green-50 dark:hover:bg-gray-700"
                   >
                     ➕ Add Manual Vital
                   </button>
                   <hr
                     className={`my-1 ${
-                      theme === "light" ? "border-gray-200" : "border-gray-700"
+                      theme === "light" ? "border-green-200" : "border-gray-700"
                     }`}
                   />
+                  <div className="px-4 py-2 text-xs text-gray-500 dark:text-gray-400">
+                    Signed in as {user.name}
+                  </div>
                   <button
                     onClick={() => {
                       logoutUser();
                       setMobileMenuOpen(false);
                     }}
-                    className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-gray-700"
                   >
-                    🔐 Logout
+                    🚪 Logout
                   </button>
                 </div>
               )}
@@ -248,37 +248,43 @@ const HomePage = () => {
               <button
                 onClick={logoutUser}
                 aria-label="Logout"
-                className="flex items-center gap-1 bg-indigo-600 text-white px-3 py-1.5 rounded font-medium text-sm hover:bg-indigo-700 transition"
+                className={`flex items-center gap-1 px-3 py-1.5 rounded-lg font-medium text-sm transition ${
+                  theme === "light"
+                    ? "bg-green-600 text-white hover:bg-green-700 shadow-md"
+                    : "bg-green-600 text-white hover:bg-green-500 shadow-md"
+                }`}
               >
-                Logout
+                🚪 Logout
               </button>
             </div>
           </div>
         )}
       </nav>
 
-      {/* Tab Switcher */}
-      <div className="shrink-0 flex justify-center mt-3 px-4 mb-3">
+      {/* Tab Switcher - Made more compact */}
+      <div className="shrink-0 flex justify-center mt-2 px-4 mb-2">
         <div
-          className={`flex gap-1 sm:gap-2 p-1 rounded-full shadow-sm border transition ${
+          className={`flex gap-1 p-1 rounded-xl shadow-sm border transition ${
             theme === "light"
-              ? "bg-indigo-50 border-indigo-100"
+              ? "bg-green-50 border-green-100"
               : "bg-gray-800 border-gray-700"
           }`}
         >
           {[
-            { id: "chat", label: "Chat", icon: "💬" },
-            { id: "pdf", label: "PDF", icon: "📄" },
+            { id: "chat", label: "AI Chat", icon: "🤖" },
+            { id: "pdf", label: "PDF Analysis", icon: "🔍" },
           ].map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 min-w-[80px] sm:min-w-[100px] ${
+              className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all focus:outline-none min-w-[120px] ${
                 activeTab === tab.id
-                  ? "bg-indigo-600 text-white shadow-md"
+                  ? theme === "light"
+                    ? "bg-green-500 text-white shadow-md"
+                    : "bg-green-600 text-white shadow-md"
                   : theme === "light"
-                  ? "text-indigo-700 hover:bg-indigo-100"
-                  : "text-indigo-300 hover:bg-gray-700"
+                  ? "text-green-700 hover:bg-green-100"
+                  : "text-green-300 hover:bg-gray-700"
               }`}
               aria-pressed={activeTab === tab.id}
             >
@@ -289,13 +295,28 @@ const HomePage = () => {
         </div>
       </div>
 
-      {/* Main Content */}
-      <main className="flex-grow overflow-hidden px-4 sm:px-6">
-        {activeTab === "chat" ? <Gemini /> : <GeminiPdf />}
+      {/* Main Content - Takes maximum space now */}
+      <main className="flex-grow overflow-hidden px-2 sm:px-4 pb-2">
+        <div className="h-full rounded-2xl overflow-hidden">
+          {activeTab === "chat" ? <Gemini /> : <GeminiPdf />}
+        </div>
       </main>
 
-      <footer className="shrink-0 text-center py-3 text-xs sm:text-sm opacity-80 border-t">
-        © {new Date().getFullYear()} HealthMate AI — Empowering Smarter Care
+      {/* Footer - Made more compact */}
+      <footer
+        className={`shrink-0 text-center py-2 text-xs opacity-70 border-t ${
+          theme === "light" ? "border-green-200" : "border-gray-700"
+        }`}
+      >
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-1 sm:gap-4">
+          <span>
+            © {new Date().getFullYear()} HealthMate — Sehat ka Smart Dost
+          </span>
+          <span className="hidden sm:inline">•</span>
+          <span className="text-xs">
+            AI is for understanding only, not for medical advice
+          </span>
+        </div>
       </footer>
     </div>
   );

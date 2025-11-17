@@ -44,8 +44,8 @@ const AddVitals = () => {
     <div
       className={`min-h-screen w-[100%] transition-colors duration-300 ${
         theme === "light"
-          ? "bg-gradient-to-br from-sky-50 via-white to-indigo-50"
-          : "bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800"
+          ? "bg-gradient-to-br from-green-50 via-white to-emerald-50"
+          : "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900"
       }`}
     >
       {/* Full-width container with responsive padding */}
@@ -55,15 +55,17 @@ const AddVitals = () => {
             onClick={() => navigate(-1)}
             className={`p-2.5 rounded-full transition ${
               theme === "light"
-                ? "bg-white text-gray-700 hover:bg-gray-100 shadow-sm"
-                : "bg-gray-800 text-gray-200 hover:bg-gray-700"
+                ? "bg-white text-gray-700 hover:bg-green-100 shadow-sm border border-green-200"
+                : "bg-gray-800 text-gray-200 hover:bg-gray-700 border border-gray-700"
             }`}
             aria-label="Go back"
           >
             ←
           </button>
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold">Add Manual Vital</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-green-700 dark:text-green-400">
+              Add Manual Vital
+            </h1>
             <p
               className={`text-sm opacity-80 mt-1 ${
                 theme === "light" ? "text-gray-600" : "text-gray-400"
@@ -75,9 +77,9 @@ const AddVitals = () => {
         </div>
 
         <div
-          className={`rounded-2xl p-4 sm:p-6 shadow-sm ${
+          className={`rounded-2xl p-4 sm:p-6 shadow-lg ${
             theme === "light"
-              ? "bg-white border border-gray-200"
+              ? "bg-white border border-green-200"
               : "bg-gray-800 border border-gray-700"
           }`}
         >
@@ -88,7 +90,7 @@ const AddVitals = () => {
                   theme === "light" ? "text-gray-800" : "text-gray-200"
                 }`}
               >
-                Date
+                📅 Date
               </label>
               <input
                 type="date"
@@ -97,8 +99,8 @@ const AddVitals = () => {
                 onChange={handleChange}
                 className={`w-full p-3 rounded-xl border focus:outline-none focus:ring-2 transition text-base ${
                   theme === "light"
-                    ? "border-gray-300 bg-gray-50 focus:ring-indigo-400 text-gray-800"
-                    : "border-gray-700 bg-gray-900 focus:ring-indigo-500 text-gray-200"
+                    ? "border-green-300 bg-green-50 focus:ring-green-400 focus:border-green-400 text-gray-800"
+                    : "border-gray-700 bg-gray-900 focus:ring-green-500 focus:border-green-500 text-gray-200"
                 }`}
                 required
               />
@@ -110,7 +112,7 @@ const AddVitals = () => {
                   theme === "light" ? "text-gray-800" : "text-gray-200"
                 }`}
               >
-                Type of Vital
+                ❤️ Type of Vital
               </label>
               <select
                 name="type"
@@ -118,8 +120,8 @@ const AddVitals = () => {
                 onChange={handleChange}
                 className={`w-full p-3 rounded-xl border focus:outline-none focus:ring-2 transition text-base ${
                   theme === "light"
-                    ? "border-gray-300 bg-white focus:ring-indigo-400 text-gray-800"
-                    : "border-gray-700 bg-gray-800 focus:ring-indigo-500 text-gray-200"
+                    ? "border-green-300 bg-white focus:ring-green-400 focus:border-green-400 text-gray-800"
+                    : "border-gray-700 bg-gray-800 focus:ring-green-500 focus:border-green-500 text-gray-200"
                 }`}
               >
                 <option value="BP">🫀 Blood Pressure</option>
@@ -136,7 +138,7 @@ const AddVitals = () => {
                   theme === "light" ? "text-gray-800" : "text-gray-200"
                 }`}
               >
-                {typeLabels[formData.type]}
+                📊 {typeLabels[formData.type]}
               </label>
               <input
                 name="value"
@@ -145,8 +147,8 @@ const AddVitals = () => {
                 placeholder="e.g., 120/80, 95, 70 kg"
                 className={`w-full p-3 rounded-xl border focus:outline-none focus:ring-2 transition text-base ${
                   theme === "light"
-                    ? "border-gray-300 bg-white focus:ring-indigo-400 text-gray-800"
-                    : "border-gray-700 bg-gray-800 focus:ring-indigo-500 text-gray-200"
+                    ? "border-green-300 bg-white focus:ring-green-400 focus:border-green-400 text-gray-800"
+                    : "border-gray-700 bg-gray-800 focus:ring-green-500 focus:border-green-500 text-gray-200"
                 }`}
                 required
               />
@@ -158,7 +160,7 @@ const AddVitals = () => {
                   theme === "light" ? "text-gray-800" : "text-gray-200"
                 }`}
               >
-                Notes (Optional)
+                📝 Notes (Optional)
               </label>
               <textarea
                 name="notes"
@@ -167,8 +169,8 @@ const AddVitals = () => {
                 placeholder="How are you feeling? Any symptoms?"
                 className={`w-full p-3 rounded-xl border focus:outline-none focus:ring-2 transition text-base ${
                   theme === "light"
-                    ? "border-gray-300 bg-white focus:ring-indigo-400 text-gray-800"
-                    : "border-gray-700 bg-gray-800 focus:ring-indigo-500 text-gray-200"
+                    ? "border-green-300 bg-white focus:ring-green-400 focus:border-green-400 text-gray-800"
+                    : "border-gray-700 bg-gray-800 focus:ring-green-500 focus:border-green-500 text-gray-200"
                 }`}
                 rows="3"
               />
@@ -180,24 +182,62 @@ const AddVitals = () => {
                 onClick={() => navigate(-1)}
                 className={`py-3 rounded-xl font-medium transition text-center ${
                   theme === "light"
-                    ? "bg-gray-200 text-gray-800 hover:bg-gray-300"
-                    : "bg-gray-700 text-gray-200 hover:bg-gray-600"
+                    ? "bg-gray-200 text-gray-800 hover:bg-gray-300 border border-gray-300"
+                    : "bg-gray-700 text-gray-200 hover:bg-gray-600 border border-gray-600"
                 } sm:flex-1`}
               >
-                Cancel
+                ↩️ Cancel
               </button>
               <button
                 type="submit"
-                className={`py-3 rounded-xl font-medium text-white transition text-center ${
+                className={`py-3 rounded-xl font-medium text-white transition text-center shadow-md ${
                   theme === "light"
-                    ? "bg-indigo-600 hover:bg-indigo-700"
-                    : "bg-indigo-500 hover:bg-indigo-600"
+                    ? "bg-green-600 hover:bg-green-700 border border-green-600"
+                    : "bg-green-600 hover:bg-green-500 border border-green-600"
                 } sm:flex-1`}
               >
-                Save Vital
+                💾 Save Vital
               </button>
             </div>
           </form>
+        </div>
+
+        {/* Quick Tips Section */}
+        <div
+          className={`mt-6 rounded-2xl p-4 sm:p-6 ${
+            theme === "light"
+              ? "bg-green-50 border border-green-200"
+              : "bg-gray-800 border border-gray-700"
+          }`}
+        >
+          <h3
+            className={`font-semibold mb-3 flex items-center gap-2 ${
+              theme === "light" ? "text-green-700" : "text-green-400"
+            }`}
+          >
+            💡 Quick Tips
+          </h3>
+          <ul
+            className={`text-sm space-y-2 ${
+              theme === "light" ? "text-gray-600" : "text-gray-300"
+            }`}
+          >
+            <li>
+              • <strong>Blood Pressure:</strong> Enter as systolic/diastolic
+              (e.g., 120/80)
+            </li>
+            <li>
+              • <strong>Blood Sugar:</strong> Enter in mg/dL (e.g., 95)
+            </li>
+            <li>
+              • <strong>Weight:</strong> Include units (e.g., 70 kg or 154 lbs)
+            </li>
+            <li>
+              • <strong>Temperature:</strong> Specify units (e.g., 98.6°F or
+              37°C)
+            </li>
+            <li>• Track regularly to monitor your health trends</li>
+          </ul>
         </div>
       </div>
     </div>
