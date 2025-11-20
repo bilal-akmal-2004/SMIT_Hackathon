@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useTheme } from "../context/ThemeContext";
+import { motion, AnimatePresence } from "framer-motion";
 
 const SearchMembers = () => {
   const [query, setQuery] = useState("");
@@ -85,8 +86,32 @@ const SearchMembers = () => {
     }
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.5,
+      },
+    },
+  };
+
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.6 }}
       className={`min-h-screen w-full transition-colors duration-300 ${
         theme === "light"
           ? "bg-gradient-to-br from-green-50 via-white to-emerald-50"
@@ -95,48 +120,77 @@ const SearchMembers = () => {
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-8">
-          <button
+        <motion.div
+          initial={{ x: -50, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.6 }}
+          className="flex items-center gap-3 mb-8"
+        >
+          <motion.button
+            whileHover={{ scale: 1.1, x: -2 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => navigate("/home")}
-            className={`p-2 rounded-full transition-all duration-300 hover:scale-110 ${
+            className={`p-2 rounded-full transition-all duration-300 ${
               theme === "light"
                 ? "bg-white text-gray-700 hover:bg-green-100 shadow-sm border border-green-200"
                 : "bg-gray-800 text-gray-200 hover:bg-gray-700 border border-gray-700"
             }`}
           >
             ←
-          </button>
+          </motion.button>
           <div>
-            <h1 className="text-2xl font-bold text-green-700 dark:text-green-400">
+            <motion.h1
+              initial={{ y: -20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="text-2xl font-bold text-green-700 dark:text-green-400"
+            >
               🤝 Share Health Data
-            </h1>
-            <p
+            </motion.h1>
+            <motion.p
+              initial={{ y: -10, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.3 }}
               className={`text-sm opacity-80 mt-1 ${
                 theme === "light" ? "text-gray-600" : "text-gray-400"
               }`}
             >
               Securely share your medical reports with family or healthcare
               providers
-            </p>
+            </motion.p>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 lg:grid-cols-3 gap-8"
+        >
           {/* Main Search Section */}
-          <div className="lg:col-span-2">
-            <div
-              className={`rounded-2xl p-8 shadow-lg transition-all duration-300 hover:shadow-xl ${
+          <motion.div variants={itemVariants} className="lg:col-span-2">
+            <motion.div
+              whileHover={{ y: -5, scale: 1.005 }}
+              className={`rounded-2xl p-8 shadow-lg transition-all duration-300 ${
                 theme === "light"
                   ? "bg-white border border-green-200 hover:border-green-300"
                   : "bg-gray-800 border border-gray-700 hover:border-gray-600"
               }`}
             >
-              <div className="text-center mb-8">
-                <div className="mx-auto w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4 transition-all duration-300 hover:scale-110">
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className="text-center mb-8"
+              >
+                <motion.div
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  className="mx-auto w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4 transition-all duration-300"
+                >
                   <span className="text-green-600 dark:text-green-300 text-3xl">
                     🔍
                   </span>
-                </div>
+                </motion.div>
                 <h2
                   className={`text-2xl font-bold mb-2 ${
                     theme === "light" ? "text-gray-900" : "text-white"
@@ -151,11 +205,12 @@ const SearchMembers = () => {
                 >
                   Search by name or email address
                 </p>
-              </div>
+              </motion.div>
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="relative">
-                  <input
+                  <motion.input
+                    whileFocus={{ scale: 1.02 }}
                     type="text"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
@@ -167,107 +222,152 @@ const SearchMembers = () => {
                     }`}
                     autoComplete="off"
                   />
-                  {results.length > 0 && (
-                    <div
-                      className={`absolute z-10 mt-2 w-full rounded-xl shadow-lg border max-h-60 overflow-y-auto ${
-                        theme === "light"
-                          ? "bg-white border-green-200"
-                          : "bg-gray-800 border-gray-700"
-                      }`}
-                    >
-                      {results.map((user) => (
-                        <div
-                          key={user._id}
-                          onClick={() => handleSelect(user)}
-                          className={`px-4 py-3 cursor-pointer transition-all duration-200 hover:scale-[1.02] ${
-                            theme === "light"
-                              ? "hover:bg-green-50 text-gray-800 border-b border-green-100 last:border-b-0"
-                              : "hover:bg-gray-700 text-gray-200 border-b border-gray-700 last:border-b-0"
-                          }`}
-                        >
-                          <div className="font-medium flex items-center gap-2">
-                            <span>👤</span>
-                            {user.name}
-                          </div>
-                          <div className="text-sm opacity-80 ml-6">
-                            {user.email}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                  <AnimatePresence>
+                    {results.length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className={`absolute z-10 mt-2 w-full rounded-xl shadow-lg border max-h-60 overflow-y-auto ${
+                          theme === "light"
+                            ? "bg-white border-green-200"
+                            : "bg-gray-800 border-gray-700"
+                        }`}
+                      >
+                        {results.map((user, index) => (
+                          <motion.div
+                            key={user._id}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: index * 0.05 }}
+                            onClick={() => handleSelect(user)}
+                            className={`px-4 py-3 cursor-pointer transition-all duration-200 hover:scale-[1.02] ${
+                              theme === "light"
+                                ? "hover:bg-green-50 text-gray-800 border-b border-green-100 last:border-b-0"
+                                : "hover:bg-gray-700 text-gray-200 border-b border-gray-700 last:border-b-0"
+                            }`}
+                          >
+                            <div className="font-medium flex items-center gap-2">
+                              <motion.span
+                                whileHover={{ scale: 1.2 }}
+                                transition={{ type: "spring", stiffness: 300 }}
+                              >
+                                👤
+                              </motion.span>
+                              {user.name}
+                            </div>
+                            <div className="text-sm opacity-80 ml-6">
+                              {user.email}
+                            </div>
+                          </motion.div>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
 
-                {selectedUser && (
-                  <div
-                    className={`p-4 rounded-xl border transition-all duration-300 ${
-                      theme === "light"
-                        ? "bg-green-50 border-green-200"
-                        : "bg-green-900/20 border-green-800"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="font-semibold text-green-700 dark:text-green-300">
-                          👤 {selectedUser.name}
+                <AnimatePresence>
+                  {selectedUser && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className={`p-4 rounded-xl border transition-all duration-300 overflow-hidden ${
+                        theme === "light"
+                          ? "bg-green-50 border-green-200"
+                          : "bg-green-900/20 border-green-800"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="font-semibold text-green-700 dark:text-green-300">
+                            👤 {selectedUser.name}
+                          </div>
+                          <div className="text-sm text-green-600 dark:text-green-400">
+                            {selectedUser.email}
+                          </div>
                         </div>
-                        <div className="text-sm text-green-600 dark:text-green-400">
-                          {selectedUser.email}
-                        </div>
+                        <motion.button
+                          whileHover={{ scale: 1.2, rotate: 90 }}
+                          whileTap={{ scale: 0.9 }}
+                          type="button"
+                          onClick={() => {
+                            setSelectedUser(null);
+                            setQuery("");
+                          }}
+                          className="text-red-500 hover:text-red-700 transition-colors"
+                        >
+                          ✕
+                        </motion.button>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSelectedUser(null);
-                          setQuery("");
-                        }}
-                        className="text-red-500 hover:text-red-700 transition-colors"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  </div>
-                )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
-                <button
+                <motion.button
+                  whileHover={!loading && !selectedUser ? { scale: 1.02 } : {}}
+                  whileTap={{ scale: 0.98 }}
                   type="submit"
                   disabled={loading || !selectedUser}
                   className={`w-full py-4 px-6 rounded-xl font-semibold text-white text-lg shadow-md transition-all duration-300 ${
                     loading || !selectedUser
                       ? "bg-gray-400 dark:bg-gray-600 cursor-not-allowed"
-                      : "bg-green-600 hover:bg-green-700 hover:scale-105 hover:shadow-lg border border-green-600"
+                      : "bg-green-600 hover:bg-green-700 hover:shadow-lg border border-green-600"
                   }`}
                 >
                   {loading ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <motion.span
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="flex items-center justify-center gap-2"
+                    >
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{
+                          duration: 1,
+                          repeat: Infinity,
+                          ease: "linear",
+                        }}
+                        className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                      />
                       Granting Access...
-                    </span>
+                    </motion.span>
                   ) : (
-                    "✅ Grant Health Data Access"
+                    <motion.span
+                      whileHover={{ scale: 1.05 }}
+                      className="flex items-center justify-center gap-2"
+                    >
+                      ✅ Grant Health Data Access
+                    </motion.span>
                   )}
-                </button>
+                </motion.button>
               </form>
 
-              {message && (
-                <div
-                  className={`mt-6 p-4 rounded-xl text-center font-medium transition-all duration-300 ${
-                    message.includes("✅")
-                      ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 border border-green-200"
-                      : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 border border-red-200"
-                  }`}
-                >
-                  {message}
-                </div>
-              )}
-            </div>
-          </div>
+              <AnimatePresence>
+                {message && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className={`mt-6 p-4 rounded-xl text-center font-medium transition-all duration-300 ${
+                      message.includes("✅")
+                        ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 border border-green-200"
+                        : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 border border-red-200"
+                    }`}
+                  >
+                    {message}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          </motion.div>
 
           {/* Sidebar - Recent Shares & Info */}
-          <div className="space-y-6">
+          <motion.div variants={itemVariants} className="space-y-6">
             {/* Recent Shares */}
-            <div
-              className={`rounded-2xl p-6 transition-all duration-300 hover:shadow-lg ${
+            <motion.div
+              whileHover={{ y: -3, scale: 1.01 }}
+              className={`rounded-2xl p-6 transition-all duration-300 ${
                 theme === "light"
                   ? "bg-white border border-green-200 hover:border-green-300"
                   : "bg-gray-800 border border-gray-700 hover:border-gray-600"
@@ -282,10 +382,14 @@ const SearchMembers = () => {
               </h3>
               {recentShares.length > 0 ? (
                 <div className="space-y-3">
-                  {recentShares.slice(0, 5).map((share) => (
-                    <div
+                  {recentShares.slice(0, 5).map((share, index) => (
+                    <motion.div
                       key={share._id}
-                      className={`p-3 rounded-lg transition-all duration-200 hover:scale-[1.02] ${
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.5 + index * 0.1 }}
+                      whileHover={{ scale: 1.02, x: 5 }}
+                      className={`p-3 rounded-lg transition-all duration-200 ${
                         theme === "light"
                           ? "bg-green-50 border border-green-200 hover:bg-green-100"
                           : "bg-gray-700 border border-gray-600 hover:bg-gray-600"
@@ -297,23 +401,27 @@ const SearchMembers = () => {
                       <div className="text-xs text-green-600 dark:text-green-400">
                         {new Date(share.sharedAt).toLocaleDateString()}
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               ) : (
-                <p
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.6 }}
                   className={`text-sm italic ${
                     theme === "light" ? "text-gray-500" : "text-gray-400"
                   }`}
                 >
                   No recent shares yet
-                </p>
+                </motion.p>
               )}
-            </div>
+            </motion.div>
 
             {/* Sharing Tips */}
-            <div
-              className={`rounded-2xl p-6 transition-all duration-300 hover:shadow-lg ${
+            <motion.div
+              whileHover={{ y: -3, scale: 1.01 }}
+              className={`rounded-2xl p-6 transition-all duration-300 ${
                 theme === "light"
                   ? "bg-green-50 border border-green-200 hover:border-green-300"
                   : "bg-gray-800 border border-gray-700 hover:border-gray-600"
@@ -326,24 +434,36 @@ const SearchMembers = () => {
               >
                 💡 Sharing Tips
               </h3>
-              <ul
+              <motion.ul
+                initial="hidden"
+                animate="visible"
+                variants={containerVariants}
                 className={`text-sm space-y-2 ${
                   theme === "light" ? "text-gray-600" : "text-gray-300"
                 }`}
               >
-                <li>
-                  • Share with family members for better health coordination
-                </li>
-                <li>• Grant access to your healthcare providers</li>
-                <li>• You can revoke access anytime</li>
-                <li>• Shared data is encrypted and secure</li>
-                <li>• Only share with trusted individuals</li>
-              </ul>
-            </div>
-          </div>
-        </div>
+                {[
+                  "Share with family members for better health coordination",
+                  "Grant access to your healthcare providers",
+                  "You can revoke access anytime",
+                  "Shared data is encrypted and secure",
+                  "Only share with trusted individuals",
+                ].map((tip, index) => (
+                  <motion.li
+                    key={index}
+                    variants={itemVariants}
+                    whileHover={{ x: 5 }}
+                    className="transition-all duration-200"
+                  >
+                    • {tip}
+                  </motion.li>
+                ))}
+              </motion.ul>
+            </motion.div>
+          </motion.div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
