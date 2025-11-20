@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useTheme } from "../context/ThemeContext";
+import { motion } from "framer-motion";
 
 const AddVitals = () => {
   const [formData, setFormData] = useState({
@@ -11,6 +12,7 @@ const AddVitals = () => {
     value: "",
     notes: "",
   });
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { theme } = useTheme();
 
@@ -20,6 +22,7 @@ const AddVitals = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/api/vitals`,
@@ -29,6 +32,8 @@ const AddVitals = () => {
       navigate("/dashboard", { replace: true });
     } catch (err) {
       alert("Failed to save vital. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -40,8 +45,32 @@ const AddVitals = () => {
     Other: "Value",
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.5,
+      },
+    },
+  };
+
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
       className={`min-h-screen w-[100%] transition-colors duration-300 ${
         theme === "light"
           ? "bg-gradient-to-br from-green-50 via-white to-emerald-50"
@@ -50,19 +79,31 @@ const AddVitals = () => {
     >
       {/* Full-width container with responsive padding */}
       <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="flex items-center gap-3 mb-6 sm:mb-8">
-          <button
+        {/* Header with Animation */}
+        <motion.div
+          initial={{ y: -50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.6 }}
+          className="flex items-center gap-3 mb-6 sm:mb-8"
+        >
+          <motion.button
+            whileHover={{ scale: 1.1, x: -2 }}
+            whileTap={{ scale: 0.9 }}
             onClick={() => navigate(-1)}
-            className={`p-2.5 rounded-full transition ${
+            className={`p-2.5 rounded-full transition-all duration-300 ${
               theme === "light"
-                ? "bg-white text-gray-700 hover:bg-green-100 shadow-sm border border-green-200"
-                : "bg-gray-800 text-gray-200 hover:bg-gray-700 border border-gray-700"
+                ? "bg-white text-gray-700 hover:bg-green-100 shadow-sm border border-green-200 hover:shadow-md"
+                : "bg-gray-800 text-gray-200 hover:bg-gray-700 border border-gray-700 hover:shadow-md"
             }`}
             aria-label="Go back"
           >
             ←
-          </button>
-          <div>
+          </motion.button>
+          <motion.div
+            initial={{ x: -20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
+          >
             <h1 className="text-xl sm:text-2xl font-bold text-green-700 dark:text-green-400">
               Add Manual Vital
             </h1>
@@ -73,18 +114,23 @@ const AddVitals = () => {
             >
               Record your health readings anytime
             </p>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
-        <div
-          className={`rounded-2xl p-4 sm:p-6 shadow-lg ${
+        {/* Main Form Container */}
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className={`rounded-2xl p-4 sm:p-6 shadow-lg transition-all duration-300 hover:shadow-xl ${
             theme === "light"
-              ? "bg-white border border-green-200"
-              : "bg-gray-800 border border-gray-700"
+              ? "bg-white border border-green-200 hover:border-green-300"
+              : "bg-gray-800 border border-gray-700 hover:border-gray-600"
           }`}
         >
           <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
-            <div>
+            {/* Date Input */}
+            <motion.div variants={itemVariants}>
               <label
                 className={`block mb-2 font-medium text-sm sm:text-base ${
                   theme === "light" ? "text-gray-800" : "text-gray-200"
@@ -92,21 +138,23 @@ const AddVitals = () => {
               >
                 📅 Date
               </label>
-              <input
+              <motion.input
+                whileFocus={{ scale: 1.02 }}
                 type="date"
                 name="date"
                 value={formData.date}
                 onChange={handleChange}
-                className={`w-full p-3 rounded-xl border focus:outline-none focus:ring-2 transition text-base ${
+                className={`w-full p-3 rounded-xl border focus:outline-none focus:ring-2 transition-all duration-300 text-base ${
                   theme === "light"
-                    ? "border-green-300 bg-green-50 focus:ring-green-400 focus:border-green-400 text-gray-800"
-                    : "border-gray-700 bg-gray-900 focus:ring-green-500 focus:border-green-500 text-gray-200"
+                    ? "border-green-300 bg-green-50 focus:ring-green-400 focus:border-green-400 text-gray-800 hover:border-green-400"
+                    : "border-gray-700 bg-gray-900 focus:ring-green-500 focus:border-green-500 text-gray-200 hover:border-gray-600"
                 }`}
                 required
               />
-            </div>
+            </motion.div>
 
-            <div>
+            {/* Type Select */}
+            <motion.div variants={itemVariants}>
               <label
                 className={`block mb-2 font-medium text-sm sm:text-base ${
                   theme === "light" ? "text-gray-800" : "text-gray-200"
@@ -114,14 +162,15 @@ const AddVitals = () => {
               >
                 ❤️ Type of Vital
               </label>
-              <select
+              <motion.select
+                whileFocus={{ scale: 1.02 }}
                 name="type"
                 value={formData.type}
                 onChange={handleChange}
-                className={`w-full p-3 rounded-xl border focus:outline-none focus:ring-2 transition text-base ${
+                className={`w-full p-3 rounded-xl border focus:outline-none focus:ring-2 transition-all duration-300 text-base ${
                   theme === "light"
-                    ? "border-green-300 bg-white focus:ring-green-400 focus:border-green-400 text-gray-800"
-                    : "border-gray-700 bg-gray-800 focus:ring-green-500 focus:border-green-500 text-gray-200"
+                    ? "border-green-300 bg-white focus:ring-green-400 focus:border-green-400 text-gray-800 hover:border-green-400"
+                    : "border-gray-700 bg-gray-800 focus:ring-green-500 focus:border-green-500 text-gray-200 hover:border-gray-600"
                 }`}
               >
                 <option value="BP">🫀 Blood Pressure</option>
@@ -129,10 +178,11 @@ const AddVitals = () => {
                 <option value="Weight">⚖️ Weight</option>
                 <option value="Temperature">🌡️ Temperature</option>
                 <option value="Other">📝 Other</option>
-              </select>
-            </div>
+              </motion.select>
+            </motion.div>
 
-            <div>
+            {/* Value Input */}
+            <motion.div variants={itemVariants}>
               <label
                 className={`block mb-2 font-medium text-sm sm:text-base ${
                   theme === "light" ? "text-gray-800" : "text-gray-200"
@@ -140,21 +190,23 @@ const AddVitals = () => {
               >
                 📊 {typeLabels[formData.type]}
               </label>
-              <input
+              <motion.input
+                whileFocus={{ scale: 1.02 }}
                 name="value"
                 value={formData.value}
                 onChange={handleChange}
                 placeholder="e.g., 120/80, 95, 70 kg"
-                className={`w-full p-3 rounded-xl border focus:outline-none focus:ring-2 transition text-base ${
+                className={`w-full p-3 rounded-xl border focus:outline-none focus:ring-2 transition-all duration-300 text-base ${
                   theme === "light"
-                    ? "border-green-300 bg-white focus:ring-green-400 focus:border-green-400 text-gray-800"
-                    : "border-gray-700 bg-gray-800 focus:ring-green-500 focus:border-green-500 text-gray-200"
+                    ? "border-green-300 bg-white focus:ring-green-400 focus:border-green-400 text-gray-800 hover:border-green-400"
+                    : "border-gray-700 bg-gray-800 focus:ring-green-500 focus:border-green-500 text-gray-200 hover:border-gray-600"
                 }`}
                 required
               />
-            </div>
+            </motion.div>
 
-            <div>
+            {/* Notes Textarea */}
+            <motion.div variants={itemVariants}>
               <label
                 className={`block mb-2 font-medium text-sm sm:text-base ${
                   theme === "light" ? "text-gray-800" : "text-gray-200"
@@ -162,85 +214,122 @@ const AddVitals = () => {
               >
                 📝 Notes (Optional)
               </label>
-              <textarea
+              <motion.textarea
+                whileFocus={{ scale: 1.02 }}
                 name="notes"
                 value={formData.notes}
                 onChange={handleChange}
                 placeholder="How are you feeling? Any symptoms?"
-                className={`w-full p-3 rounded-xl border focus:outline-none focus:ring-2 transition text-base ${
+                className={`w-full p-3 rounded-xl border focus:outline-none focus:ring-2 transition-all duration-300 text-base resize-none ${
                   theme === "light"
-                    ? "border-green-300 bg-white focus:ring-green-400 focus:border-green-400 text-gray-800"
-                    : "border-gray-700 bg-gray-800 focus:ring-green-500 focus:border-green-500 text-gray-200"
+                    ? "border-green-300 bg-white focus:ring-green-400 focus:border-green-400 text-gray-800 hover:border-green-400"
+                    : "border-gray-700 bg-gray-800 focus:ring-green-500 focus:border-green-500 text-gray-200 hover:border-gray-600"
                 }`}
                 rows="3"
               />
-            </div>
+            </motion.div>
 
-            <div className="flex flex-col sm:flex-row gap-3 pt-2">
-              <button
+            {/* Action Buttons */}
+            <motion.div
+              variants={itemVariants}
+              className="flex flex-col sm:flex-row gap-3 pt-2"
+            >
+              <motion.button
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
                 type="button"
                 onClick={() => navigate(-1)}
-                className={`py-3 rounded-xl font-medium transition text-center ${
+                className={`py-3 rounded-xl font-medium transition-all duration-300 text-center ${
                   theme === "light"
-                    ? "bg-gray-200 text-gray-800 hover:bg-gray-300 border border-gray-300"
-                    : "bg-gray-700 text-gray-200 hover:bg-gray-600 border border-gray-600"
+                    ? "bg-gray-200 text-gray-800 hover:bg-gray-300 border border-gray-300 hover:shadow-md"
+                    : "bg-gray-700 text-gray-200 hover:bg-gray-600 border border-gray-600 hover:shadow-md"
                 } sm:flex-1`}
               >
                 ↩️ Cancel
-              </button>
-              <button
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
                 type="submit"
-                className={`py-3 rounded-xl font-medium text-white transition text-center shadow-md ${
-                  theme === "light"
-                    ? "bg-green-600 hover:bg-green-700 border border-green-600"
-                    : "bg-green-600 hover:bg-green-500 border border-green-600"
+                disabled={loading}
+                className={`py-3 rounded-xl font-medium text-white transition-all duration-300 text-center shadow-md ${
+                  loading
+                    ? "opacity-70 cursor-not-allowed"
+                    : theme === "light"
+                    ? "bg-green-600 hover:bg-green-700 border border-green-600 hover:shadow-lg"
+                    : "bg-green-600 hover:bg-green-500 border border-green-600 hover:shadow-lg"
                 } sm:flex-1`}
               >
-                💾 Save Vital
-              </button>
-            </div>
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{
+                        duration: 1,
+                        repeat: Infinity,
+                        ease: "linear",
+                      }}
+                      className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
+                    />
+                    Saving...
+                  </span>
+                ) : (
+                  <span className="flex items-center justify-center gap-2">
+                    💾 Save Vital
+                  </span>
+                )}
+              </motion.button>
+            </motion.div>
           </form>
-        </div>
+        </motion.div>
 
         {/* Quick Tips Section */}
-        <div
-          className={`mt-6 rounded-2xl p-4 sm:p-6 ${
+        <motion.div
+          initial={{ y: 50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.4, duration: 0.6 }}
+          className={`mt-6 rounded-2xl p-4 sm:p-6 transition-all duration-300 hover:shadow-lg ${
             theme === "light"
-              ? "bg-green-50 border border-green-200"
-              : "bg-gray-800 border border-gray-700"
+              ? "bg-green-50 border border-green-200 hover:border-green-300"
+              : "bg-gray-800 border border-gray-700 hover:border-gray-600"
           }`}
         >
-          <h3
+          <motion.h3
+            whileHover={{ x: 5 }}
             className={`font-semibold mb-3 flex items-center gap-2 ${
               theme === "light" ? "text-green-700" : "text-green-400"
             }`}
           >
             💡 Quick Tips
-          </h3>
-          <ul
+          </motion.h3>
+          <motion.ul
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
             className={`text-sm space-y-2 ${
               theme === "light" ? "text-gray-600" : "text-gray-300"
             }`}
           >
-            <li>
-              • <strong>Blood Pressure:</strong> Enter as systolic/diastolic
-              (e.g., 120/80)
-            </li>
-            <li>
-              • <strong>Blood Sugar:</strong> Enter in mg/dL (e.g., 95)
-            </li>
-            <li>
-              • <strong>Weight:</strong> Include units (e.g., 70 kg or 154 lbs)
-            </li>
-            <li>
-              • <strong>Temperature:</strong> Specify units (e.g., 98.6°F or
-              37°C)
-            </li>
-            <li>• Track regularly to monitor your health trends</li>
-          </ul>
-        </div>
+            {[
+              "• Blood Pressure: Enter as systolic/diastolic (e.g., 120/80)",
+              "• Blood Sugar: Enter in mg/dL (e.g., 95)",
+              "• Weight: Include units (e.g., 70 kg or 154 lbs)",
+              "• Temperature: Specify units (e.g., 98.6°F or 37°C)",
+              "• Track regularly to monitor your health trends",
+            ].map((tip, index) => (
+              <motion.li
+                key={index}
+                variants={itemVariants}
+                whileHover={{ x: 5 }}
+                className="transition-all duration-200"
+              >
+                {tip}
+              </motion.li>
+            ))}
+          </motion.ul>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
