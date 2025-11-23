@@ -96,7 +96,13 @@ const GeminiPDF = () => {
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 overflow-scroll flex flex-col lg:flex-row">
+        <div
+          className={`flex-1 overflow-scroll flex flex-col lg:flex-row ${
+            theme === "light"
+              ? "custom-scrollbar-light"
+              : "custom-scrollbar-dark"
+          }`}
+        >
           {/* Left Panel - Input Section (Smaller on desktop) */}
           <div
             className={`lg:w-2/5 xl:w-1/3 p-6 border-r ${
