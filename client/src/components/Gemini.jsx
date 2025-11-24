@@ -196,7 +196,11 @@ const Gemini = () => {
       </div>
 
       {/* Chat Messages */}
-      <div className="flex-1 p-4 overflow-y-auto space-y-4 bg-gradient-to-b from-transparent to-green-50/30 dark:to-gray-900/50">
+      <div
+        className={`flex-1 p-4 overflow-y-auto space-y-4 bg-gradient-to-b from-transparent to-green-50/30 dark:to-gray-900/50 ${
+          theme === "light" ? "custom-scrollbar-light" : "custom-scrollbar-dark"
+        }`}
+      >
         {messages.length === 0 && !loading && (
           <div className="text-center mt-12">
             <div className="text-5xl mb-4 opacity-60">💬</div>
