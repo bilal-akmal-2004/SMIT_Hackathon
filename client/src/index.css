@@ -1,49 +1,77 @@
 @import "tailwindcss";
 
-/* In your global CSS file */
+/* ================================
+   CUSTOM SCROLLBARS (LIGHT MODE)
+   ================================ */
+
+/* Width of the scrollbar (Chrome, Edge, Safari) */
 .custom-scrollbar-light::-webkit-scrollbar {
   width: 8px;
 }
 
+/* Background area behind the scrollbar thumb */
 .custom-scrollbar-light::-webkit-scrollbar-track {
-  background: #f0fdf4; /* green-50 */
+  background: #f0fdf4; /* Tailwind green-50 */
   border-radius: 10px;
 }
 
+/* The draggable part of the scrollbar */
 .custom-scrollbar-light::-webkit-scrollbar-thumb {
-  background: #86efac; /* green-300 */
+  background: #86efac; /* Tailwind green-300 */
   border-radius: 10px;
 }
 
+/* Thumb color when hovered */
 .custom-scrollbar-light::-webkit-scrollbar-thumb:hover {
-  background: #4ade80; /* green-400 */
+  background: #4ade80; /* Tailwind green-400 */
 }
 
+
+/* ================================
+   CUSTOM SCROLLBARS (DARK MODE)
+   ================================ */
+
+/* Width of the scrollbar */
 .custom-scrollbar-dark::-webkit-scrollbar {
   width: 8px;
 }
 
+/* Background track color */
 .custom-scrollbar-dark::-webkit-scrollbar-track {
-  background: #1f2937; /* gray-800 */
+  background: #1f2937; /* Tailwind gray-800 */
   border-radius: 10px;
 }
 
+/* Draggable thumb color */
 .custom-scrollbar-dark::-webkit-scrollbar-thumb {
-  background: #4b5563; /* gray-600 */
+  background: #4b5563; /* Tailwind gray-600 */
   border-radius: 10px;
 }
 
+/* Hover state */
 .custom-scrollbar-dark::-webkit-scrollbar-thumb:hover {
-  background: #6b7280; /* gray-500 */
+  background: #6b7280; /* Tailwind gray-500 */
 }
 
-/* Firefox */
+
+/* ================================
+   FIREFOX SUPPORT
+   ================================
+   Firefox does NOT use ::-webkit-scrollbar,
+   so we provide a fallback using:
+
+   scrollbar-width  → thin / auto / none
+   scrollbar-color  → thumbColor trackColor
+   ================================ */
+
+/* Light mode scrollbar for Firefox */
 .custom-scrollbar-light {
   scrollbar-width: thin;
-  scrollbar-color: #86efac #f0fdf4;
+  scrollbar-color: #86efac #f0fdf4; /* thumb | track */
 }
 
+/* Dark mode scrollbar for Firefox */
 .custom-scrollbar-dark {
   scrollbar-width: thin;
-  scrollbar-color: #4b5563 #1f2937;
+  scrollbar-color: #4b5563 #1f2937; /* thumb | track */
 }
